@@ -37,10 +37,13 @@
 //   456: "abc",
 //};
 
+const { getAllRoom, getAllState } = require("../models/game-server");
 const GameState = require("../models/game-state");
 require("dotenv");
 
 exports.gameLoop = (gameCode, role, move) => {
+  const state = getAllState();
+  console.log(state);
   const pos1 = { ...state[gameCode][role].pos };
   const oppoRole = role === "prisoner" ? "warder" : "prisoner";
   const pos2 = { ...state[gameCode][oppoRole].pos };

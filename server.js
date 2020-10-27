@@ -14,5 +14,4 @@ io.on("connection", (socket) => {
   socket.on("createNewGame", gameController.createGame.bind(this, socket));
   socket.on("joinRoom", gameController.joinGame.bind(this, socket));
   socket.on("assignBlock", gameController.assignBlock.bind(this, socket));
-  socket.on("gameStart");
 });

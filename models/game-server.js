@@ -1,7 +1,7 @@
 // state[gameCode] = GameState.creategamestate()
-let state = {};
+const state = {};
 // gameRooms[socket.id] = gameCode
-let gameRooms = {};
+const gameRooms = {};
 
 module.exports = {
   setGameRoom: (id, gameCode) => {
@@ -17,5 +17,11 @@ module.exports = {
   },
   getState: (gameCode) => {
     return state[gameCode];
+  },
+  getAllRoom: () => {
+    return gameRooms;
+  },
+  getAllState: () => {
+    return state;
   },
 };

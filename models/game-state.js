@@ -1,24 +1,9 @@
-// exports.creategameState = (id) => {
-//   const randomNum = Math.floor(Math.random() * 2);
-//   const role = randomNum === 0 ? "warder" : "prisoner";
-//   //random position
-//   const rv = {
-//     winpos: {},
-//     blocks: [{}],
-//   };
-//   rv[role] = {
-//     id: id,
-//     pos: {},
-//   };
-
-//   rv.remainingRole = role === "warder" ? "prisoner" : "warder";
-//   return { gameState: rv, role: role };
-// };
+const { randomPos } = require("../util/pos");
 
 class GameState {
   warder = {};
   prisoner = {};
-  winPos = {};
+  tunnel = {};
   blocks = [];
   turn = "";
   remainingRole = "";
@@ -28,6 +13,7 @@ class GameState {
     const randomNum = Math.floor(Math.random() * 2);
     const role = randomNum === 0 ? "warder" : "prisoner";
     rv[role].id = id;
+    rv[role].pos = randomPos();
     rv.remainingRole = role === "warder" ? "prisoner" : "warder";
     return rv;
   }
