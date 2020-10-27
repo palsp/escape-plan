@@ -4,6 +4,7 @@ import Players from "./components/Players";
 import Timer from "./components/Timer";
 
 function App() {
+
   return (
     <div className="center">
       <div className="game-area">

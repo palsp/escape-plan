@@ -15,6 +15,7 @@ class GameState {
     rv[role].id = id;
     rv[role].pos = randomPos();
     rv.remainingRole = role === "warder" ? "prisoner" : "warder";
+    rv.turn = "prisoner";
     return rv;
   }
 }

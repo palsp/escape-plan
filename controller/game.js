@@ -59,7 +59,7 @@ exports.joinGame = (socket, gameCode) => {
       // check block not equal to states of tunnel/warder/prisoner
       // block must be at least 2*GRID_WIDTH distance apart
       let blocks = [];
-      for (let i = 0; i > 0; i++) {
+      for (let i = 0; i < 5; i++) {
         let block;
         while (true) {
           block = randomPos();
