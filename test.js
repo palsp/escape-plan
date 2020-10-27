@@ -59,3 +59,5 @@ for (let i = 0; i < 5; i++) {
   }
 }
 console.log(blocks);
+
+const msg = "this is a test"
