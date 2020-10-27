@@ -19,6 +19,12 @@
 
 // console.log(x
 
+const randomPos = () => {
+  const x = Math.floor(Math.random() * 5) * 100;
+  const y = Math.floor(Math.random() * 5) * 100;
+
+  return { x: x, y: y };
+};
 const isEqualPos = (pos1, pos2) => {
   return pos1.x === pos2.x && pos1.y === pos2.y;
 };
@@ -39,4 +45,17 @@ let x = [
   { x: 2, y: 2 },
 ];
 
-console.log(isInArrayOf({ x: 1, y: 2 }, x));
+// console.log(isInArrayOf({ x: 1, y: 2 }, x));
+let blocks = [];
+for (let i = 0; i < 5; i++) {
+  let block;
+  while (true) {
+    block = randomPos();
+    // console.log("block", block);
+    if (!isInArrayOf(block, blocks)) {
+      blocks.push(block);
+      break;
+    }
+  }
+}
+console.log(blocks);
