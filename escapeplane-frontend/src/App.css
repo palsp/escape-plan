@@ -1,0 +1,30 @@
+.game-area {
+  position: relative;
+  margin: 50px auto;
+  width: 500px;
+  height: 500px;
+  border: 1px solid;
+}
+
+.player1 {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  background-color: green;
+}
+
+.player2 {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  background-color: red;
+}
+
+/* Text mouse coordinate */
+.center {
+  text-align: center;
+}
