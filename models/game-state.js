@@ -1,60 +1,35 @@
-// const mongoose = require('mongoose');
-// const Schema  = mongoose.Schema;
+// exports.creategameState = (id) => {
+//   const randomNum = Math.floor(Math.random() * 2);
+//   const role = randomNum === 0 ? "warder" : "prisoner";
+//   //random position
+//   const rv = {
+//     winpos: {},
+//     blocks: [{}],
+//   };
+//   rv[role] = {
+//     id: id,
+//     pos: {},
+//   };
 
-// const gameStateSchema = new Schema({
-//       gameCode: String,
-//       prisoner : {
-
-//       },
-//       warder: {
-
-//       },
-//       winPos: {
-
-//       },
-//       blockPos: [{
-
-//       }]
-
-// })
+//   rv.remainingRole = role === "warder" ? "prisoner" : "warder";
+//   return { gameState: rv, role: role };
+// };
 
 class GameState {
-  constructor() {
-    this.prinsoer = {
-      id: "",
-      pos: {
-        x: 0,
-        y: 0,
-      },
-    };
-    this.warder = {
-      id: "",
-      pos: {
-        x: 0,
-        y: 0,
-      },
-    };
-    this.winPos = {
-      x: 0,
-      y: 0,
-    };
-    this.blockPos = [{}];
-  }
-  getPrisoner() {
-    return this.prisoner;
-  }
-  getWarder() {
-    return this.warder;
-  }
-  getWinPos() {
-    return this.winPos;
-  }
-  getblockPos() {
-    return this.blockPos;
-  }
+  warder = {};
+  prisoner = {};
+  winPos = {};
+  blocks = [];
+  turn = "";
+  remainingRole = "";
 
-  static creategameState() {
-    // random prinsonerpos, warderpos, winblock
+  static createGameState(id) {
+    const rv = new GameState();
+    const randomNum = Math.floor(Math.random() * 2);
+    const role = randomNum === 0 ? "warder" : "prisoner";
+    rv[role].id = id;
+    rv.remainingRole = role === "warder" ? "prisoner" : "warder";
+    return rv;
   }
 }
 

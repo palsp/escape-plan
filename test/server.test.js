@@ -7,7 +7,7 @@ describe("Server Test", () => {
     expect(res.pos1.y).to.be.equal(0);
   });
 
-  it("oppoRole sould be equal to prisoner", () => {
+  it("oppoRole should be equal to prisoner", () => {
     const res = gameLoop("abc", "warder", 47);
     expect(res.oppoRole).to.be.equal("prisoner");
   });
