@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from "react";
 
 function Timer() {
-  const [timer, setTimer] = useState(0);
+  const [timer, setTimer] = useState(10);
 
   const tick = () => {
-    setTimer((prevTimer) => prevTimer + 1);
+    setTimer((prevTimer) => {
+      if (prevTimer === 0) {
+        return 10;
+      }
+      return prevTimer - 1;
+    });
   };
 
   useEffect(() => {
     setInterval(tick, 1000);
 
-    return () => {
-      clearInterval();
-    };
+    // return () => {
+    //   clearInterval();
+    // };
   }, []);
 
   return <div>{timer}</div>;
