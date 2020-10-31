@@ -1,98 +1,75 @@
-const uniqid = require("uniqid");
-const GameServer = require("../models/game-server");
+exports.startgame = (socket, gameState) => {};
+
+const { getAllRoom, getAllState } = require("../models/game-server");
 const GameState = require("../models/game-state");
-const { randomPos, isEqualPos, isInArrayOf } = require("../util/pos");
+require("dotenv");
 
-exports.createGame = (socket) => {
-  //   console.log(socket);
-  const gameCode = uniqid();
-  const state = GameState.createGameState(socket.id);
-  const room = GameServer.setGameRoom(socket.id, gameCode);
-  const getstate = GameServer.setState(gameCode, state);
-  console.log("room", room, "state", getstate);
-  const rv = { message: "This is ypur game code : " + gameCode };
-  socket.join(gameCode, () => {
-    socket.emit("newGame", "This is your game code : " + gameCode);
-  });
-};
+exports.gameLoop = (gameCode, role, move) => {
+  const state = getAllState();
+  console.log(state);
+  const pos1 = { ...state[gameCode][role].pos };
+  const oppoRole = role === "prisoner" ? "warder" : "prisoner";
+  const pos2 = { ...state[gameCode][oppoRole].pos };
 
-exports.joinGame = (socket, gameCode) => {
-  const io = require("../socket").getIO();
-  console.log(gameCode);
-  const room = io.sockets.adapter.rooms[gameCode];
-  let allUsers;
-  if (room) {
-    allUsers = room.sockets;
+  const block = { ...state }[gameCode].blockPos;
+  const win = { ...state }[gameCode].winPos;
+  let vel;
+  switch (move) {
+    // left
+    case 65:
+      vel = { x: -100, y: 0 };
+      break;
+    //up
+    case 87:
+      vel = { x: 0, y: 100 };
+      break;
+    //right
+    case 68:
+      vel = { x: 100, y: 0 };
+      break;
+    //down
+    case 83:
+      vel = { x: 0, y: -100 };
+      break;
+    default:
+      vel = { x: 0, y: 0 };
   }
-  let numClients = 0;
-  if (allUsers) {
-    numClients = Object.keys(allUsers).length;
+  pos1.x += vel.x;
+  pos1.y += vel.y;
+  //   console.log(vel);
+  let winner;
+  //   console.log(pos1);
+  // 0 = game over  , 1 = warder win , 2 = prisoner win
+  if (
+    pos1.x < 0 ||
+    pos1.y < 0 ||
+    pos1.x > process.env.GRID_SIZE ||
+    process.env.GRID_SIZE
+  ) {
+    return 0;
   }
-  console.log(numClients);
-  let errMessage;
-  if (numClients === 0) {
-    // room is not existed
-    errMessage = "Room " + gameCode + " does not existed";
-  } else if (numClients > 1) {
-    // room is full
-    errMessage = "Room" + gameCode + "is full";
-  } else {
-    return socket.join(gameCode, () => {
-      // return state and role to user
-      const state = GameServer.getState(gameCode);
-      const role = state.remainingRole;
-      // state[role] = { id: socket.id, pos: { x: 1, y: 1 } };
-      state[role].id = socket.id;
-      state[role].pos = randomPos();
-      state.remainingRole = "";
-      // random tunnel pos
-      while (true) {
-        state.tunnel = randomPos();
-        if (
-          !isEqualPos(state.tunnel, state.warder) &&
-          !isEqualPos(state.tunnel, state.prisoner)
-          //state.tunnel not equal to state.block
-        ) {
-          break;
-        }
-      }
-      // check block not equal to states of tunnel/warder/prisoner
-      // block must be at least 2*GRID_WIDTH distance apart
-      let blocks = [];
-      for (let i = 0; i < 5; i++) {
-        let block;
-        while (true) {
-          block = randomPos();
-          if (!isInArrayOf(block, blocks)) {
-            blocks.push(block);
-            break;
-          }
-        }
-      }
 
-      state.blocks = blocks;
-
-      const updatedState = GameServer.setState(gameCode, state);
-      // console.log(updatedState);
-      const rv = JSON.stringify({
-        message: "You are in room " + gameCode,
-        gameState: updatedState,
-        role: role,
-      });
-      return socket.emit("joinSuccess", rv);
-    });
+  if (pos1.x === pos2.x && pos1.y === pos2.y) {
+    return 1;
   }
-  console.log(errMessage);
-  return socket.emit("err", JSON.stringify({ message: errMessage }));
-};
 
-exports.assignBlock = (socket, input) => {
-  const io = require("../socket").getIO();
-  const convertedInput = JSON.parse(input);
-  const gameCode = convertedInput.gameCode;
-  const blocks = convertedInput.blocks;
-  const state = GameServer.getState(gameCode);
-  state.blocks = blocks;
-  GameServer.setState(state);
-  return io.in(gameCode).emit("finishSetup", state);
+  if (pos1 === "prisoner" && pos1.x === win.x && pos1.y === pos2.y) {
+    return 2;
+  }
+
+  if (block.includes(pos1)) {
+    return 0;
+  }
+  state[gameCode][role].pos.x = pos1.x;
+  state[gameCode][role].pos.y = pos1.y;
+
+  //   return winner;
+  return {
+    // winner: winner,
+    pos1: pos1,
+    pos2: pos2,
+    oppoRole: oppoRole,
+    block: block,
+    win: win,
+  };
 };
