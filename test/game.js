@@ -1,8 +1,7 @@
 const { expect } = require("chai");
 const sinon = require("sinon");
-const { setGameRoom } = require("../models/game-server");
-const GameServer = require("../models/game-server");
-const gameController = require("../controller/game");
+const GameServer , {setGameRoom} = require("../models/server");
+const roomController = require("../controller/room");
 const socket = require("../socket");
 // const { getIO } = require("../socket");
 
