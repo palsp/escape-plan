@@ -1,27 +1,13 @@
-
-import React, { useState, useEffect, useContext } from "react";
-
-import { use } from "chai";
+import React, { useState, useEffect } from "react";
 import opensocket from "socket.io-client";
 import "../App.css";
-import GameArea from "./GameArea";
-import HowToPlay from "./HowToPlay";
-import { Link } from "react-router-dom";
 
 export const UserContext = React.createContext();
 
 function HomePage({ history }) {
-
-  const [transformedInput, setTransformedInput] = useState();
-  const [gameCode, setGameCode] = useState();
-  const [myRole, setMyRole] = useState();
-  const [gameState, setGameState] = useState();
-  // const onClickHandler1 = () => {
-  //   history.push("/serverorclient");
-  // };
   const [socket, setSocket] = useState(null);
   const initialFormData = Object.freeze({
-    gameCode: "",
+    gameCode: ""
   });
 
   const [formData, updateFormData] = useState(initialFormData);
@@ -29,75 +15,57 @@ function HomePage({ history }) {
   const newGameHandler = () => {
     console.log("[HomePage.js] newGameHandler");
     socket.emit("createNewGame");
-
-
-    history.push("/gamearea", {
-      transformedInput: transformedInput,
-      gameCode: gameCode,
-      myRole: myRole,
-      gameState: gameState
-    });
   };
 
-  const inputHandler = (event) => {
+  const inputHandler = event => {
     updateFormData({
       ...formData,
-      [event.target.name]: event.target.value.trim(),
+      [event.target.name]: event.target.value.trim()
     });
   };
 
-  const joinGameHandler = (event) => {
+  const joinGameHandler = event => {
     event.preventDefault();
-    //console.log(formData.gameCode);∫
     const gameCode = formData.gameCode;
     socket.emit("joinRoom", gameCode);
   };
 
-
   const howToPlayHandler = () => {
-    history.push("/howtoplay", {
-      transformedInput: transformedInput,
-      gameCode: gameCode,
-      myRole: myRole,
-      gameState: gameState
-    });
+    history.push("/howtoplay");
   };
   useEffect(() => {
     setSocket(opensocket("http://localhost:5000"));
   }, []);
 
-
-  
-
   useEffect(() => {
-    // console.log("use effect 1 ", socket);
     if (socket) {
       console.log("here");
-      socket.on("newGame", (input) => {
-         const transformedInput = JSON.parse(input);
-      setTransformedInput(transformedInput);
+      socket.on("newGame", input => {
+        const transformedInput = JSON.parse(input);
 
-      const gameCode = transformedInput.gameCode;
-      setGameCode(gameCode);
+        const gameCode = transformedInput.gameCode;
 
-      const myRole = transformedInput.myRole;
-      setMyRole(myRole);
+        const myRole = transformedInput.myRole;
 
-      const gameState = transformedInput.state;
-      setGameState(gameState);
+        const gameState = transformedInput.state;
+
         // go to game area
+        history.push("/gamearea", {
+          transformedInput: transformedInput,
+          gameCode: gameCode,
+          myRole: myRole,
+          gameState: gameState,
+          socketState: socket
+        });
       });
-    
-      socket.on("joinSuccess", (input) => {
+
+      socket.on("joinSuccess", input => {
         const tramsformedInput = JSON.parse(input);
         console.log(tramsformedInput);
       });
     }
   });
 
-  // const submitHandler = (e) => {
-  //   console.log(e.target.value);
-  // };
   return (
     <div className="center">
       <br></br>
@@ -108,13 +76,10 @@ function HomePage({ history }) {
         <h1>Start Game</h1>
       </button>
 
-
-
       <label>
         <input type="text" name="gameCode" onChange={inputHandler}></input>
       </label>
       <button onClick={joinGameHandler}>Submit</button>
-
 
       <br></br>
       <button
