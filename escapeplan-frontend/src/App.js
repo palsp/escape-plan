@@ -11,6 +11,7 @@ function App() {
       <BrowserRouter>
         <Switch>
           <Route path="/" exact component={HomePage}></Route>
+          {/* <Route path="/" exact render={props => <HomePage />}></Route> */}
           <Route path="/gamearea" exact component={GameArea}></Route>
           <Route
             path="/serverorclient"

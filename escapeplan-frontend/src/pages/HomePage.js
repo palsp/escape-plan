@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import opensocket from "socket.io-client";
 import "../App.css";
 
+export const UserContext = React.createContext();
+
 function HomePage({ history }) {
-  // const onClickHandler1 = () => {
-  //   history.push("/serverorclient");
-  // };
   const [socket, setSocket] = useState(null);
   const initialFormData = Object.freeze({
     gameCode: "",
@@ -16,7 +15,6 @@ function HomePage({ history }) {
   const newGameHandler = () => {
     console.log("[HomePage.js] newGameHandler");
     socket.emit("createNewGame");
-    history.push("/serverorclient");
   };
 
   const inputHandler = (event) => {
@@ -28,44 +26,46 @@ function HomePage({ history }) {
 
   const joinGameHandler = (event) => {
     event.preventDefault();
-    //console.log(formData.gameCode);∫
     const gameCode = formData.gameCode;
     socket.emit("joinRoom", gameCode);
   };
 
-  const onClickHandler2 = () => {
+  const howToPlayHandler = () => {
     history.push("/howtoplay");
   };
   useEffect(() => {
     setSocket(opensocket("http://localhost:5000"));
   }, []);
-  useEffect(() => {
-    opensocket("http://localhost:5000");
-  }, []);
 
   useEffect(() => {
-    // console.log("use effect 1 ", socket);
     if (socket) {
       console.log("here");
       socket.on("newGame", (input) => {
         const transformedInput = JSON.parse(input);
+
         const gameCode = transformedInput.gameCode;
+
         const myRole = transformedInput.myRole;
-        const state = transformedInput.state;
-        console.log(gameCode, myRole, state);
+
+        const gameState = transformedInput.state;
+
         // go to game area
+        history.push("/gamearea", {
+          transformedInput: transformedInput,
+          gameCode: gameCode,
+          myRole: myRole,
+          gameState: gameState,
+          socketState: socket,
+        });
       });
+
       socket.on("joinSuccess", (input) => {
         const tramsformedInput = JSON.parse(input);
         console.log(tramsformedInput);
-        history.push("/serverorclient");
       });
     }
   });
 
-  // const submitHandler = (e) => {
-  //   console.log(e.target.value);
-  // };
   return (
     <div className="center">
       <br></br>
@@ -84,7 +84,7 @@ function HomePage({ history }) {
       <br></br>
       <button
         style={{ width: "500px", height: "300px" }}
-        onClick={onClickHandler2}
+        onClick={howToPlayHandler}
       >
         <h1>How to play</h1>
       </button>

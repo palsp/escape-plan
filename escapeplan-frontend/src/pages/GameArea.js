@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
 
-function GameArea({ history }) {
+function GameArea({ history, location }) {
+  // --------- Game Information ----------
+  const info = location.state;
+
+  const myRole = info.myRole;
+
+  const [posWarderX, setPosWarderX] = useState(0);
+  const [posWarderY, setPosWarderY] = useState(0);
+
+  const [posPrisonerX, setPosPrisonerX] = useState(0);
+  const [posPrisonerY, setPosPrisonerY] = useState(0);
+
   //--------Timer---------
 
   const [turn, setTurn] = useState(true);
@@ -51,6 +62,7 @@ function GameArea({ history }) {
       randomPosition();
     } else {
       setX1(x1);
+      console.log("x1", x1);
       setY1(y1);
 
       setX2(x2);
@@ -105,9 +117,26 @@ function GameArea({ history }) {
     }
   };
 
+  function positionSet() {
+    if (myRole == "warder") {
+      console.log("here");
+      setPosWarderX(info.gameState.warder.pos.x);
+      setPosWarderY(info.gameState.warder.pos.y);
+    } else {
+      setPosPrisonerX(info.gameState.prisoner.pos.x);
+      setPosPrisonerY(info.gameState.prisoner.pos.y);
+    }
+    console.log("warder x", posWarderX);
+    console.log("warder y", posWarderY);
+    console.log("prisoner x", posPrisonerX);
+    console.log("prisoner y", posPrisonerY);
+  }
   useEffect(() => {
+    console.log("eieieiie", location.state);
+    positionSet();
+    // positionSet();
     randomPosition();
-  }, []);
+  }, [posPrisonerX, posPrisonerY, posWarderX, posWarderY]);
 
   useEffect(() => {
     window.addEventListener("keydown", onKeyPressHandler);
@@ -131,7 +160,6 @@ function GameArea({ history }) {
       >
         <h2>back</h2>
       </button>
-
       <div className="center">
         <br></br>
         <br></br>
@@ -152,7 +180,7 @@ function GameArea({ history }) {
           <div className="player2" style={{ left: x2, bottom: y2 }}></div>
         </div>
         <h2>
-          Position 1 X:{x1}, Y:{y1}
+          Position 1 X:{posWarderX}, Y:{posWarderY}
         </h2>
         <h2>
           Position 2 X:{x2}, Y:{y2}
