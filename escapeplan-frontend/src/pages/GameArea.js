@@ -1,7 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "../App.css";
 
-function GameArea({ history }) {
+import HomePage from "./HomePage";
+
+import { UserContext } from "./HomePage";
+
+function GameArea({ history, location }) {
+  // --------- Game Information ----------
+  const gameState = location.state.gameState;
   //--------Timer---------
 
   const [turn, setTurn] = useState(true);
@@ -106,6 +112,8 @@ function GameArea({ history }) {
   };
 
   useEffect(() => {
+    console.log("eieieiie", location.state);
+
     randomPosition();
   }, []);
 
@@ -131,7 +139,6 @@ function GameArea({ history }) {
       >
         <h2>back</h2>
       </button>
-
       <div className="center">
         <br></br>
         <br></br>
