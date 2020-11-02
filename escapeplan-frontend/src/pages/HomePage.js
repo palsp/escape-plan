@@ -1,22 +1,38 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import opensocket from "socket.io-client";
 import "../App.css";
+import GameArea from "./GameArea";
+import HowToPlay from "./HowToPlay";
+import { Link } from "react-router-dom";
+
+export const UserContext = React.createContext();
 
 function HomePage({ history }) {
   let socket;
-  // const onClickHandler1 = () => {
-  //   history.push("/serverorclient");
-  // };
+  const [transformedInput, setTransformedInput] = useState();
+  const [gameCode, setGameCode] = useState();
+  const [myRole, setMyRole] = useState();
+  const [gameState, setGameState] = useState();
 
   const newGameHandler = () => {
     console.log("[HomePage.js] newGameHandler");
     socket.emit("createNewGame");
+
+    history.push("/gamearea", {
+      transformedInput: transformedInput,
+      gameCode: gameCode,
+      myRole: myRole,
+      gameState: gameState
+    });
   };
 
-  const joinGameHandler = () => {};
-
-  const onClickHandler2 = () => {
-    history.push("/howtoplay");
+  const howToPlayHandler = () => {
+    history.push("/howtoplay", {
+      transformedInput: transformedInput,
+      gameCode: gameCode,
+      myRole: myRole,
+      gameState: gameState
+    });
   };
 
   useEffect(() => {
@@ -26,18 +42,22 @@ function HomePage({ history }) {
 
   useEffect(() => {
     console.log("[Homepage.js] use 2nd effect");
-    socket.on("newGame", (input) => {
+    socket.on("newGame", input => {
       const transformedInput = JSON.parse(input);
+      setTransformedInput(transformedInput);
+
       const gameCode = transformedInput.gameCode;
+      setGameCode(gameCode);
+
       const myRole = transformedInput.myRole;
-      const state = transformedInput.state;
-      console.log(gameCode, myRole, state);
+      setMyRole(myRole);
+
+      const gameState = transformedInput.state;
+      setGameState(gameState);
+      // console.log(gameCode, myRole, gameState);
     });
   }, []);
 
-  const submitHandler = (e) => {
-    console.log(e.target.value);
-  };
   return (
     <div className="center">
       <br></br>
@@ -48,17 +68,10 @@ function HomePage({ history }) {
         <h1>Start Game</h1>
       </button>
 
-      <form>
-        <label>
-          <input type="text" name="gamecode"></input>
-        </label>
-        <input type="submit" value="Submit" onClick={submitHandler}></input>
-      </form>
-
       <br></br>
       <button
         style={{ width: "500px", height: "300px" }}
-        onClick={onClickHandler2}
+        onClick={howToPlayHandler}
       >
         <h1>How to play</h1>
       </button>
