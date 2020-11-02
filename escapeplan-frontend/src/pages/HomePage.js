@@ -1,43 +1,70 @@
-import React, { useEffect } from "react";
+import { use } from "chai";
+import React, { useEffect, useState } from "react";
 import opensocket from "socket.io-client";
 import "../App.css";
 
 function HomePage({ history }) {
-  let socket;
   // const onClickHandler1 = () => {
   //   history.push("/serverorclient");
   // };
+  const [socket, setSocket] = useState(null);
+  const initialFormData = Object.freeze({
+    gameCode: "",
+  });
+
+  const [formData, updateFormData] = useState(initialFormData);
 
   const newGameHandler = () => {
     console.log("[HomePage.js] newGameHandler");
     socket.emit("createNewGame");
   };
 
-  const joinGameHandler = () => {};
+  const inputHandler = (event) => {
+    updateFormData({
+      ...formData,
+      [event.target.name]: event.target.value.trim(),
+    });
+  };
+
+  const joinGameHandler = (event) => {
+    event.preventDefault();
+    //console.log(formData.gameCode);∫
+    const gameCode = formData.gameCode;
+    socket.emit("joinRoom", gameCode);
+  };
 
   const onClickHandler2 = () => {
     history.push("/howtoplay");
   };
-
   useEffect(() => {
-    socket = opensocket("http://localhost:5000");
-    console.log("[Homepage.js] use 1st effect");
+    setSocket(opensocket("http://localhost:5000"));
+  }, []);
+  useEffect(() => {
+    opensocket("http://localhost:5000");
   }, []);
 
   useEffect(() => {
-    console.log("[Homepage.js] use 2nd effect");
-    socket.on("newGame", (input) => {
-      const transformedInput = JSON.parse(input);
-      const gameCode = transformedInput.gameCode;
-      const myRole = transformedInput.myRole;
-      const state = transformedInput.state;
-      console.log(gameCode, myRole, state);
-    });
-  }, []);
+    // console.log("use effect 1 ", socket);
+    if (socket) {
+      console.log("here");
+      socket.on("newGame", (input) => {
+        const transformedInput = JSON.parse(input);
+        const gameCode = transformedInput.gameCode;
+        const myRole = transformedInput.myRole;
+        const state = transformedInput.state;
+        console.log(gameCode, myRole, state);
+        // go to game area
+      });
+      socket.on("joinSuccess", (input) => {
+        const tramsformedInput = JSON.parse(input);
+        console.log(tramsformedInput);
+      });
+    }
+  });
 
-  const submitHandler = (e) => {
-    console.log(e.target.value);
-  };
+  // const submitHandler = (e) => {
+  //   console.log(e.target.value);
+  // };
   return (
     <div className="center">
       <br></br>
@@ -48,12 +75,10 @@ function HomePage({ history }) {
         <h1>Start Game</h1>
       </button>
 
-      <form>
-        <label>
-          <input type="text" name="gamecode"></input>
-        </label>
-        <input type="submit" value="Submit" onClick={submitHandler}></input>
-      </form>
+      <label>
+        <input type="text" name="gameCode" onChange={inputHandler}></input>
+      </label>
+      <button onClick={joinGameHandler}>Submit</button>
 
       <br></br>
       <button
