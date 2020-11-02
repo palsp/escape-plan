@@ -1,4 +1,3 @@
-import { use } from "chai";
 import React, { useEffect, useState } from "react";
 import opensocket from "socket.io-client";
 import "../App.css";
@@ -17,6 +16,7 @@ function HomePage({ history }) {
   const newGameHandler = () => {
     console.log("[HomePage.js] newGameHandler");
     socket.emit("createNewGame");
+    history.push("/serverorclient");
   };
 
   const inputHandler = (event) => {
@@ -58,6 +58,7 @@ function HomePage({ history }) {
       socket.on("joinSuccess", (input) => {
         const tramsformedInput = JSON.parse(input);
         console.log(tramsformedInput);
+        history.push("/serverorclient");
       });
     }
   });
