@@ -1,62 +1,27 @@
-import logo from "./logo.svg";
-import "./App.css";
-import Players from "./components/Players";
-import Timer from "./components/Timer";
-import { useEffect, useState } from "react";
-import opensocket from "socket.io-client";
+import React from "react";
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import HowToPlay from "./pages/HowToPlay";
+import ServerOrClient from "./pages/ServerOrClient";
+import GameArea from "./pages/GameArea";
 
-const App = (props) => {
-  let gameState, setGameState;
-  let socket;
-  useEffect(() => {
-    socket = opensocket("http://localhost:3000/");
-  }, []);
-
-  useEffect(() => {
-    socket.on("gameStart", (msg) => {
-      console.log("msg");
-    });
-  }, []);
-  const createGameHandler = () => {
-    socket.emit("createNewGame");
-  };
-
-  // const joinGameHandler = (gameCode) => {
-  //   socket.emit("joinRoom", gameCode);
-  // };
-
-  const joinGameHandler = () => {
-    console.log("yessss");
-  };
-  useEffect(() => {
-    socket.on("newGame", (input) => {
-      const msg = JSON.parse(input);
-      console.log(msg);
-      // msg = {state : ... , myRole : ....  , gameCode : ..... }
-      [gameState, setGameState] = useState(msg);
-    });
-  });
-
+function App() {
   return (
-    <div className="center">
-      <div className="App">
-        <button onClick={createGameHandler}>Create New Game </button>
-        <form>
-          <input id="gameRoom" type="text" />
-          <button type="submit" value="Submit" onSubmit={joinGameHandler}>
-            Join Room
-          </button>
-        </form>
-      </div>
-      <div className="game-area">
-        {" "}
-        <Players></Players>{" "}
-      </div>
-
-      <h3>Timer</h3>
-      <Timer></Timer>
+    <div>
+      <BrowserRouter>
+        <Switch>
+          <Route path="/" exact component={HomePage}></Route>
+          <Route path="/gamearea" exact component={GameArea}></Route>
+          <Route
+            path="/serverorclient"
+            exact
+            component={ServerOrClient}
+          ></Route>
+          <Route path="/howtoplay" exact component={HowToPlay}></Route>
+        </Switch>
+      </BrowserRouter>
     </div>
   );
-};
+}
 
 export default App;

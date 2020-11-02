@@ -3,7 +3,7 @@
   margin: 50px auto;
   width: 500px;
   height: 500px;
-  border: 1px solid black;
+  border: 1px solid;
 }
 
 .player1 {
@@ -24,7 +24,20 @@
   background-color: red;
 }
 
+.player3 {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  background-color: blue;
+}
+
 /* Text mouse coordinate */
 .center {
   text-align: center;
+}
+
+.redText {
+  color: red;
 }
