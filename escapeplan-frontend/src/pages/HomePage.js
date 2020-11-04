@@ -7,9 +7,7 @@ export const UserContext = React.createContext();
 
 function HomePage({ history }) {
   const [socket, setSocket] = useState(null);
-  const initialFormData = Object.freeze({
-    gameCode: "",
-  });
+  const initialFormData = Object.freeze({ gameCode: "" });
 
   const [formData, updateFormData] = useState(initialFormData);
 
@@ -18,14 +16,14 @@ function HomePage({ history }) {
     socket.emit("createNewGame");
   };
 
-  const inputHandler = (event) => {
+  const inputHandler = event => {
     updateFormData({
       ...formData,
-      [event.target.name]: event.target.value.trim(),
+      [event.target.name]: event.target.value.trim()
     });
   };
 
-  const joinGameHandler = (event) => {
+  const joinGameHandler = event => {
     event.preventDefault();
     const gameCode = formData.gameCode;
     socket.emit("joinRoom", gameCode);
@@ -43,7 +41,7 @@ function HomePage({ history }) {
   useEffect(() => {
     if (socket) {
       console.log("here");
-      socket.on("newGame", (input) => {
+      socket.on("newGame", input => {
         const transformedInput = JSON.parse(input);
 
         const gameCode = transformedInput.gameCode;
@@ -57,11 +55,11 @@ function HomePage({ history }) {
           transformedInput: transformedInput,
           gameCode: gameCode,
           myRole: myRole,
-          gameState: gameState,
+          gameState: gameState
         });
       });
 
-      socket.on("joinSuccess", (input) => {
+      socket.on("joinSuccess", input => {
         const tramsformedInput = JSON.parse(input);
         console.log(tramsformedInput);
       });
