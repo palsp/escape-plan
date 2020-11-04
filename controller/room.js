@@ -31,7 +31,7 @@ exports.createGame = (socket) => {
 
 exports.joinGame = (socket, gameCode) => {
   const io = require("../socket").getIO();
-  console.log(gameCode);
+  // console.log(gameCode);
   const room = io.sockets.adapter.rooms[gameCode];
   let allUsers;
   if (room) {

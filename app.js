@@ -124,55 +124,55 @@ const startInterval = (socket, gameState) => {
   }, 10000);
 };
 
-// const gameLoop = (gameCode, role) => {
-//   //   const currentPos = state[gameCode][userState].pos;
-//   const pos1 = { ...state }[gameCode][role].pos;
-//   const oppoRole = role === "prisoner" ? "prisoner" : "warder";
-//   const pos2 = { ...state }[gameCode][oppoRole].pos;
-//   const block = { ...state }[gameCode].blockPos;
-//   const win = { ...state }[gameCode].winPos;
+const gameLoop = (gameCode, role) => {
+  //   const currentPos = state[gameCode][userState].pos;
+  const pos1 = { ...state }[gameCode][role].pos;
+  const oppoRole = role === "prisoner" ? "prisoner" : "warder";
+  const pos2 = { ...state }[gameCode][oppoRole].pos;
+  const block = { ...state }[gameCode].blockPos;
+  const win = { ...state }[gameCode].winPos;
 
-//   let vel = { x: 10, y: 10 };
-//   switch (move) {
-//     // left
-//     case 37:
+  let vel = { x: 10, y: 10 };
+  switch (move) {
+    // left
+    case 37:
 
-//     //up
-//     case 38:
+    //up
+    case 38:
 
-//     //right
-//     case 39:
+    //right
+    case 39:
 
-//     //down
-//     case 40:
-//   }
-//   pos1.x += vel.x;
-//   pos1.y += vel.y;
-//   let winner;
+    //down
+    case 40:
+  }
+  pos1.x += vel.x;
+  pos1.y += vel.y;
+  let winner;
 
-//   // 0 = game over  , 1 = warder win , 2 = prisoner win
-//   if (
-//     pos.x < 0 ||
-//     pos.y < 0 ||
-//     pos.x > process.env.GRID_SIZE ||
-//     process.env.GRID_SIZE
-//   ) {
-//     return 0;
-//   }
+  // 0 = game over  , 1 = warder win , 2 = prisoner win
+  if (
+    pos.x < 0 ||
+    pos.y < 0 ||
+    pos.x > process.env.GRID_SIZE ||
+    process.env.GRID_SIZE
+  ) {
+    return 0;
+  }
 
-//   if (pos1 === pos2) {
-//     return 1;
-//   }
+  if (pos1 === pos2) {
+    return 1;
+  }
 
-//   if (pos1 === "prisoner" && pos1 === win) {
-//     return 2;
-//   }
+  if (pos1 === "prisoner" && pos1 === win) {
+    return 2;
+  }
 
-//   if (block.includes(pos1)) {
-//     return 0;
-//   }
-//   state[gameCode][role].pos.x = pos1.x;
-//   state[gameCode][role].pos.y = pos1.y;
+  if (block.includes(pos1)) {
+    return 0;
+  }
+  state[gameCode][role].pos.x = pos1.x;
+  state[gameCode][role].pos.y = pos1.y;
 
-//   return winner;
-// };
+  return winner;
+};

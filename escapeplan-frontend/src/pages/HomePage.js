@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import opensocket from "socket.io-client";
+import Socket from "../Socket";
 import "../App.css";
 
 export const UserContext = React.createContext();
@@ -34,7 +35,9 @@ function HomePage({ history }) {
     history.push("/howtoplay");
   };
   useEffect(() => {
-    setSocket(opensocket("http://localhost:5000"));
+    const socket = opensocket("http://localhost:5000/");
+    setSocket(socket);
+    Socket.init(socket);
   }, []);
 
   useEffect(() => {
@@ -48,14 +51,13 @@ function HomePage({ history }) {
         const myRole = transformedInput.myRole;
 
         const gameState = transformedInput.state;
-
+        console.log(socket);
         // go to game area
         history.push("/gamearea", {
           transformedInput: transformedInput,
           gameCode: gameCode,
           myRole: myRole,
           gameState: gameState,
-          socketState: socket,
         });
       });
 
