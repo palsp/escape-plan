@@ -11,13 +11,13 @@ setInterval(() => {
 
 let x = [
   { x: 1, y: 1 },
-  { x: 2, y: 2 },
+  { x: 2, y: 2 }
 ];
 
 console.log(Object.is({ x: 1, y: 1 }, x[1]));
 console.log(Object.is({ x: 2, y: 2 }, x[1]));
 
-console.log(x
+console.log(x);
 
 const randomPos = () => {
   const x = Math.floor(Math.random() * 5) * 100;
@@ -42,7 +42,7 @@ const isInArrayOf = (pos1, Arraypos) => {
 
 let x = [
   { x: 1, y: 1 },
-  { x: 2, y: 2 },
+  { x: 2, y: 2 }
 ];
 
 // console.log(isInArrayOf({ x: 1, y: 2 }, x));
@@ -60,4 +60,4 @@ for (let i = 0; i < 5; i++) {
 }
 console.log(blocks);
 
-const msg = "this is a test"
+const msg = "this is a test";

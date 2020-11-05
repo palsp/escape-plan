@@ -1,7 +1,7 @@
 let socket;
 
 const Socket = {
-  init: (client) => {
+  init: client => {
     socket = client;
     return socket;
   },
@@ -10,7 +10,7 @@ const Socket = {
       throw new Error("socket is not initialized");
     }
     return socket;
-  },
+  }
 };
 
 export default Socket;

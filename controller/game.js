@@ -70,6 +70,6 @@ exports.gameLoop = (gameCode, role, move) => {
     pos2: pos2,
     oppoRole: oppoRole,
     block: block,
-    win: win,
+    win: win
   };
 };

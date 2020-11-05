@@ -6,7 +6,7 @@ function GameArea({ history, location }) {
   // --------- Game Information ----------
 
   const [socket, setSocket] = useState(Socket.getClient());
-  //console.log("socket", Socket.getClient());
+  // console.log("socket", Socket.getClient());
 
   const info = location.state;
   const myRole = info.myRole;
@@ -64,51 +64,63 @@ function GameArea({ history, location }) {
   //   }
   // };
 
+  const [keyPress, setKeyPress] = useState("");
+
   const onKeyPressHandler = e => {
     // Warder turn
     if (turn && timer > 0) {
       let [x, y] = [posWarder[0], posWarder[1]];
 
       if (e.key === "a" && x !== 0) {
+        setKeyPress(e.key);
         setPosWarder([x - 100, y]);
         setTurn(!turn);
         setTimer(10);
       }
       if (e.key === "w" && y !== 400) {
+        setKeyPress(e.key);
         setPosWarder([x, y + 100]);
         setTurn(!turn);
         setTimer(10);
       }
       if (e.key === "s" && y !== 0) {
+        setKeyPress(e.key);
         setPosWarder([x, y - 100]);
         setTurn(!turn);
         setTimer(10);
       }
       if (e.key === "d" && x !== 400) {
+        setKeyPress(e.key);
         setPosWarder([x + 100, y]);
         setTurn(!turn);
         setTimer(10);
+        console.log("check1", keyPress);
       }
     }
     // Prisoner turn
     if (!turn && timer > 0) {
       let [x, y] = [posPrisoner[0], posPrisoner[1]];
       if (e.key === "a" && x !== 0) {
+        setKeyPress(e.key);
         setPosPrisoner([x - 100, y]);
         setTurn(!turn);
         setTimer(10);
       }
       if (e.key === "w" && y !== 400) {
+        setKeyPress(e.key);
         setPosPrisoner([x, y + 100]);
         setTurn(!turn);
         setTimer(10);
       }
       if (e.key === "s" && y !== 0) {
+        setKeyPress(e.key);
         setPosPrisoner([x, y - 100]);
         setTurn(!turn);
         setTimer(10);
       }
       if (e.key === "d" && x !== 400) {
+        setKeyPress(e.key);
+        console.log("check1", keyPress);
         setPosPrisoner([x + 100, y]);
         setTurn(!turn);
         setTimer(10);
@@ -133,6 +145,9 @@ function GameArea({ history, location }) {
   };
 
   useEffect(() => {
+    console.log("info", info);
+    console.log("block", info.gameState.blocks);
+    console.log("tunnel", info.gameState.tunnel);
     positionSet();
   }, []);
 
@@ -142,6 +157,10 @@ function GameArea({ history, location }) {
     console.log("POS WARDER", posWarder);
     console.log("POS PRISONER", posPrisoner);
     console.log("");
+
+    socket.emit("warderMove", keyPress);
+    socket.emit("prisonerMove", keyPress);
+    setKeyPress("");
 
     return () => {
       window.removeEventListener("keydown", onKeyPressHandler);
