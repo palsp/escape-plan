@@ -9,7 +9,6 @@ exports.createGame = (socket) => {
   const state = GameState.createGameState(socket.id);
   GameServer.setGameRoom(socket.id, gameCode);
   GameServer.setState(gameCode, state);
-  console.log("room", gameCode, "state", state);
 
   // this user role
   let currentUserRole = "prisoner";
@@ -41,7 +40,6 @@ exports.joinGame = (socket, gameCode) => {
   if (allUsers) {
     numClients = Object.keys(allUsers).length;
   }
-  console.log(numClients);
   let errMessage;
   if (numClients === 0) {
     // room is not existed
@@ -69,6 +67,7 @@ exports.joinGame = (socket, gameCode) => {
           break;
         }
       }
+
       // check block not equal to states of tunnel/warder/prisoner
       // block must be at least 2*GRID_WIDTH distance apart
       let blocks = [];
@@ -76,6 +75,7 @@ exports.joinGame = (socket, gameCode) => {
         let block;
         while (true) {
           block = randomPos();
+
           if (!isInArrayOf(block, blocks)) {
             blocks.push(block);
             break;
@@ -89,12 +89,15 @@ exports.joinGame = (socket, gameCode) => {
       // console.log(updatedState);
       const rv = JSON.stringify({
         message: "You are in room " + gameCode,
-        gameState: updatedState,
-        role: role,
+        state: updatedState,
+        gameCode: gameCode,
+        myRole: role,
       });
-      return socket.emit("joinSuccess", rv);
+
+      socket.emit("joinSuccess", rv);
+      return io.in(gameCode).emit("gameStart", JSON.stringify(updatedState));
+      // return io.in(gameCode).emit("gameStart", updatedState);
     });
   }
-  console.log(errMessage);
   return socket.emit("err", JSON.stringify({ message: errMessage }));
 };

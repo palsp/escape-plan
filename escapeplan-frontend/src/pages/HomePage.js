@@ -16,14 +16,14 @@ function HomePage({ history }) {
     socket.emit("createNewGame");
   };
 
-  const inputHandler = event => {
+  const inputHandler = (event) => {
     updateFormData({
       ...formData,
-      [event.target.name]: event.target.value.trim()
+      [event.target.name]: event.target.value.trim(),
     });
   };
 
-  const joinGameHandler = event => {
+  const joinGameHandler = (event) => {
     event.preventDefault();
     const gameCode = formData.gameCode;
     socket.emit("joinRoom", gameCode);
@@ -41,7 +41,7 @@ function HomePage({ history }) {
   useEffect(() => {
     if (socket) {
       console.log("here");
-      socket.on("newGame", input => {
+      socket.on("newGame", (input) => {
         const transformedInput = JSON.parse(input);
 
         const gameCode = transformedInput.gameCode;
@@ -49,19 +49,29 @@ function HomePage({ history }) {
         const myRole = transformedInput.myRole;
 
         const gameState = transformedInput.state;
-        console.log(socket);
-        // go to game area
+
+        // go to game area // user 1
         history.push("/gamearea", {
           transformedInput: transformedInput,
-          gameCode: gameCode,
           myRole: myRole,
-          gameState: gameState
+          gameState: gameState,
+          gameCode: gameCode,
         });
       });
 
-      socket.on("joinSuccess", input => {
-        const tramsformedInput = JSON.parse(input);
-        console.log(tramsformedInput);
+      socket.on("joinSuccess", (input) => {
+        const transformedInput = JSON.parse(input);
+        const myRole = transformedInput.myRole;
+        const gameState = transformedInput.state;
+        const gameCode = transformedInput.gameCode;
+
+        // go to game area // user 2
+        history.push("/gamearea", {
+          transformedInput: transformedInput,
+          myRole: myRole,
+          gameState: gameState,
+          gameCode: gameCode,
+        });
       });
     }
   });

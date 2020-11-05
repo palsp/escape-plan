@@ -14,8 +14,9 @@ class GameState {
     const role = randomNum === 0 ? "warder" : "prisoner";
     rv[role].id = id;
     rv[role].pos = randomPos();
+    rv[role].win = 0;
     rv.remainingRole = role === "warder" ? "prisoner" : "warder";
-    rv.turn = "prisoner";
+    rv.turn = false;
     return rv;
   }
 }

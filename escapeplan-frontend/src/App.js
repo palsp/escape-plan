@@ -3,8 +3,8 @@ import { BrowserRouter, Switch, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import HowToPlay from "./pages/HowToPlay";
 import ServerOrClient from "./pages/ServerOrClient";
-// import GameArea from "./pages/GameArena/GameArea";
-import GameArea from "./pages/GameArea";
+
+import GameArea from "./pages/GameArea/GameArea2";
 
 function App() {
   return (

@@ -1,5 +1,4 @@
 const express = require("express");
-const { set } = require("mongoose");
 const app = express();
 const server = app.listen(3000);
 const io = require("socket.io")(server);

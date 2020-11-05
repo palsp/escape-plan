@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
-import Socket from "../Socket";
-import "../App.css";
+import Socket from "../../Socket";
+import Player from "../../components/Player/Player";
+import Timer from "../../components/Timer/Timer";
+import Turn from "../../components/Turn/Turn";
+import "./GameArea.css";
 
 function GameArea({ history, location }) {
   // --------- Game Information ----------
@@ -27,7 +30,7 @@ function GameArea({ history, location }) {
   };
 
   const tick = () => {
-    setTimer(prevTimer => prevTimer - 1);
+    setTimer((prevTimer) => prevTimer - 1);
   };
 
   useEffect(() => {
@@ -46,27 +49,9 @@ function GameArea({ history, location }) {
 
   // -------- Game Process ------------
 
-  // const randomPosition = () => {
-  //   let x1 = Math.floor(Math.random() * 5) * 100;
-  //   let y1 = Math.floor(Math.random() * 5) * 100;
-
-  //   let x2 = Math.floor(Math.random() * 5) * 100;
-  //   let y2 = Math.floor(Math.random() * 5) * 100;
-
-  //   if (x1 == x2 && y1 == y2) {
-  //     randomPosition();
-  //   } else {
-  //     setX1(x1);
-  //     setY1(y1);
-
-  //     setX2(x2);
-  //     setY2(y2);
-  //   }
-  // };
-
   const [keyPress, setKeyPress] = useState("");
 
-  const onKeyPressHandler = e => {
+  const onKeyPressHandler = (e) => {
     // Warder turn
     if (turn && timer > 0) {
       let [x, y] = [posWarder[0], posWarder[1]];
@@ -122,7 +107,7 @@ function GameArea({ history, location }) {
         setKeyPress(e.key);
         console.log("check1", keyPress);
         setPosPrisoner([x + 100, y]);
-        setTurn(!turn);
+        setTurn((prevState) => !prevState);
         setTimer(10);
       }
     }
@@ -139,7 +124,7 @@ function GameArea({ history, location }) {
       setPosWarder([0, 0]);
       setPosPrisoner([
         info.gameState.prisoner.pos.x,
-        info.gameState.prisoner.pos.y
+        info.gameState.prisoner.pos.y,
       ]);
     }
   };
@@ -153,10 +138,10 @@ function GameArea({ history, location }) {
 
   useEffect(() => {
     window.addEventListener("keydown", onKeyPressHandler);
-    console.log("---------------move---------------");
-    console.log("POS WARDER", posWarder);
-    console.log("POS PRISONER", posPrisoner);
-    console.log("");
+    // console.log("---------------move---------------");
+    // console.log("POS WARDER", posWarder);
+    // console.log("POS PRISONER", posPrisoner);
+    // console.log("");
 
     socket.emit("warderMove", keyPress);
     socket.emit("prisonerMove", keyPress);
@@ -184,31 +169,9 @@ function GameArea({ history, location }) {
       <div className="center">
         <br></br>
         <br></br>
-        Time: <b>{timer}</b>
+        <Timer />
         <br></br>
-        <h2>
-          TURN: {[" "]}
-          <span>
-            {turn ? (
-              <span style={{ color: "green" }}>Warder</span>
-            ) : (
-              <span style={{ color: "red" }}>Prisoner</span>
-            )}
-          </span>
-        </h2>
-        <div className="game-area">
-          <div
-            className="player1"
-            style={{ left: posWarder[0], bottom: posWarder[1] }}
-          ></div>
-          <div
-            className="player2"
-            style={{ left: posPrisoner[0], bottom: posPrisoner[1] }}
-          ></div>
-        </div>
-        <h2>
-          Position Warder X:{posWarder[0]}, Y:{posWarder[1]}
-        </h2>
+        <Turn turn={!turn} />
         <h2>
           Position Prisoner X:{posPrisoner[0]}, Y:{posPrisoner[1]}
         </h2>
@@ -216,5 +179,3 @@ function GameArea({ history, location }) {
     </div>
   );
 }
-
-export default GameArea;
