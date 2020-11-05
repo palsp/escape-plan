@@ -7,6 +7,7 @@ import Player from "../../components/Player/Player";
 import Turn from "../../components/Turn/Turn";
 import Aux from "../../hoc/Aux";
 import "./GameArea.css";
+import server from "../../../../models/server";
 
 function GameArea2({ history, location }) {
   const info = location.state;
@@ -176,11 +177,26 @@ function GameArea2({ history, location }) {
       console.log("turn after set from game state", turn);
     });
 
-    socket.on("prisonerWin", (serverState) => {});
+    socket.on("prisonerWin", (serverState) => {
+      alert("prisoner win");
+      setGameState(JSON.parse(serverState));
+      setTurn(JSON.parse(serverState).turn);
+    });
 
-    socket.on("warderWin");
+    socket.on("warderWin", (serverState) => {
+      alert("warder win");
+      setGameState(JSON.parse(serverState));
+      setTurn(JSON.parse(serverState).turn);
+    });
 
-    socket.on("GameWinner");
+    socket.on("gameWinner", (serverMsg) => {
+      const msg = JSON.parse(serverMsg);
+      if (myRole === msg.myRole) {
+        alert(msg.winMsg);
+      } else {
+        alert(msg.loseMsg);
+      }
+    });
   }, []);
 
   let header = null;

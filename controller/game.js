@@ -2,8 +2,7 @@ const GameState = require("../models/gameState");
 const GameServer = require("../models/server");
 const CheckPos = require("../util/pos");
 const Socket = require("../socket");
-require("dotenv");
-
+require("dotenv").config();
 exports.validateMove = (socket, msg) => {
   const transformedInput = JSON.parse(msg);
   const gameCode = transformedInput.gameCode;
@@ -28,7 +27,7 @@ exports.validateMove = (socket, msg) => {
     return;
   }
 
-  console.log("before game loop", "player", player, "opponent", opponent);
+  // console.log("before game loop", "player", player, "opponent", opponent);
   const winner = this.gameLoop(
     gameCode,
     player.pos,
@@ -51,19 +50,41 @@ exports.validateMove = (socket, msg) => {
     console.log("After shift", gameState.turn);
     return io.in(gameCode).emit("gameContinue", JSON.stringify(gameState));
   } else if (winner === 0) {
-    return io.in(gameCode).emit("invalidMove", gameState);
+    // invalidMove
+    return io.in(gameCode).emit("invalidMove", JSON.stringify(gameState));
   } else if (winner === 1) {
-    gameState.warder.win += 1;
-    return io.in(gameCode).emit("warderWin", gameState);
+    // warder win
+    gameState["warder"].win += 1;
+    if (gameState["warder"].win === 3) {
+      gameState = {};
+      return io.in(gameCode).emit("gameWinner", {
+        myRole: "warder",
+        winMsg: "Congratulation!!!",
+        loseMsg: "You lose!!!!!",
+      });
+    }
+    const helper = gameState["warder"];
+    gameState["warder"] = gameState["prisoner"];
+    gameState["prisoner"] = helper;
+    gameState.turn = true;
+    return io.in(gameCode).emit("warderWin", JSON.parse(gameState));
   } else if (winner === 2) {
-    gameState.prisoner.win += 1;
-    return io.in(gameCode).emit("prisonerWin", gameState);
-  }
-
-  if (gameState.prisoner.win) {
-    return io
-      .in(gameCode)
-      .emit("gameWinner", JSON.stringify({ message: "We have a winner" }));
+    // prisoner win
+    gameState["prisoner"].win += 1;
+    if (gameState["prisoner"].win === 3) {
+      gameState = {};
+      // clear game Room
+      return io.in(gameCode).emit("gameWinner", {
+        myRole: "prisoner",
+        winMsg: "Congratulation!!!",
+        loseMsg: "You lose!!!!!",
+      });
+    }
+    const helper = gameState["warder"];
+    gameState["warder"] = gameState["prisoner"];
+    gameState["prisoner"] = helper;
+    gameState.turn = false;
+    return io.in(gameCode).emit("prisonerWin", JSON.parse(gameState));
   }
 };
 
@@ -103,11 +124,11 @@ exports.gameLoop = (gameCode, player, opponent, blocks, tunnel, move, turn) => {
   if (
     pos.x < 0 ||
     pos.y < 0 ||
-    pos.x > process.env.GRID_SIZE ||
-    pos.y > process.env.GRID_SIZE
+    pos.x > +process.env.GRID_SIZE ||
+    pos.y > +process.env.GRID_SIZE
   ) {
     // invalid move
-    return 4;
+    return 0;
   }
 
   if (pos.x === opponent.x && pos.y === opponent.y) {
@@ -126,5 +147,5 @@ exports.gameLoop = (gameCode, player, opponent, blocks, tunnel, move, turn) => {
   }
   player.x = pos.x;
   player.y = pos.y;
-  return;
+  return null;
 };

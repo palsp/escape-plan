@@ -54,7 +54,18 @@ exports.joinGame = (socket, gameCode) => {
       const role = state.remainingRole;
       // state[role] = { id: socket.id, pos: { x: 1, y: 1 } };
       state[role].id = socket.id;
+      opponentRole = role === "prisoner" ? "warder" : "prisoner";
+      while (true) {
+        const newPos = randomPos();
+        const opponentPos = state[opponentRole].pos;
+        if (newPos.x !== opponentPos.x && newPos.y !== opponentPos.y) {
+          state[role].pos = newPos;
+          break;
+        }
+      }
       state[role].pos = randomPos();
+
+      state[role].win = 0;
       state.remainingRole = "";
       // random tunnel pos
       while (true) {

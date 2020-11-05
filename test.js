@@ -62,6 +62,6 @@
 
 // const msg = "this is a test";
 
-const text = "awsd";
+require("dotenv").config();
 
-console.log(text.includes("a"));
+console.log(typeof +process.env.GRID_SIZE);
