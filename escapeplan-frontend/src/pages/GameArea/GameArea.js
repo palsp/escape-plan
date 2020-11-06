@@ -138,10 +138,7 @@ function GameArea({ history, location }) {
 
   useEffect(() => {
     window.addEventListener("keydown", onKeyPressHandler);
-    // console.log("---------------move---------------");
-    // console.log("POS WARDER", posWarder);
-    // console.log("POS PRISONER", posPrisoner);
-    // console.log("");
+
 
     socket.emit("warderMove", keyPress);
     socket.emit("prisonerMove", keyPress);

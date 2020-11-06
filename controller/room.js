@@ -55,26 +55,26 @@ exports.joinGame = (socket, gameCode) => {
       // state[role] = { id: socket.id, pos: { x: 1, y: 1 } };
       state[role].id = socket.id;
       opponentRole = role === "prisoner" ? "warder" : "prisoner";
+      const opponentPos = state[opponentRole].pos;
       while (true) {
         const newPos = randomPos();
-        const opponentPos = state[opponentRole].pos;
         if (newPos.x !== opponentPos.x && newPos.y !== opponentPos.y) {
           state[role].pos = newPos;
           break;
         }
       }
-      state[role].pos = randomPos();
-
       state[role].win = 0;
       state.remainingRole = "";
       // random tunnel pos
       while (true) {
-        state.tunnel = randomPos();
+        // state.tunnel = randomPos();
+        const tunnel = randomPos();
         if (
           !isEqualPos(state.tunnel, state.warder) &&
           !isEqualPos(state.tunnel, state.prisoner)
           //state.tunnel not equal to state.block
         ) {
+          state.tunnel = tunnel;
           break;
         }
       }
@@ -87,7 +87,12 @@ exports.joinGame = (socket, gameCode) => {
         while (true) {
           block = randomPos();
 
-          if (!isInArrayOf(block, blocks)) {
+          if (
+            !isInArrayOf(block, blocks) &&
+            !isEqualPos(block, opponentPos) &&
+            !isEqualPos(block, state[role].pos) &&
+            !isEqualPos(block, state.tunnel)
+          ) {
             blocks.push(block);
             break;
           }
