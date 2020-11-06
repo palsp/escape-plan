@@ -11,25 +11,27 @@ import "./GameArea.css";
 function GameArea2({ history, location }) {
   const info = location.state;
   const [socket, setSocket] = useState(Socket.getClient());
-
   // get properties from server
   // warder = true , prisoner = false
   const [gameState, setGameState] = useState();
+
+  const [winCount, setWinCount] = useState(0);
+  const [myRole, setMyRole] = useState(info.myRole);
 
   const [gameStart, setGameStart] = useState(false);
 
   const [turn, setTurn] = useState();
 
-  useEffect(() => {
-    if (socket) {
-      socket.on("gameStart", (msg) => {
-        const rcvState = JSON.parse(msg);
-        setGameState({ ...rcvState });
-        setTurn(rcvState.turn);
-        setGameStart(true);
-      });
-    }
-  });
+  // useEffect(() => {
+  //   if (socket) {
+  //     socket.on("gameStart", (msg) => {
+  //       const rcvState = JSON.parse(msg);
+  //       setGameState({ ...rcvState });
+  //       setTurn(rcvState.turn);
+  //       setGameStart(true);
+  //     });
+  //   }
+  // });
 
   const [timer, setTimer] = useState(10);
 
@@ -86,7 +88,6 @@ function GameArea2({ history, location }) {
   const onKeyPressHandler = (event) => {
     // [turn] true = warder , false = prisoner
     let role = turn ? "warder" : "prisoner";
-    console.log("turn ", role);
     const validmove = moveValidation(
       event.key,
       gameState[role].pos,
@@ -112,31 +113,57 @@ function GameArea2({ history, location }) {
     return () => {
       window.removeEventListener("keypress", onKeyPressHandler);
     };
-  }, [turn, gameState]);
+  }, [turn, gameState, myRole]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("gameStart", (msg) => {
+        const rcvState = JSON.parse(msg);
+        setGameState({ ...rcvState });
+        setTurn(rcvState.turn);
+        setGameStart(true);
+        setWinCount(rcvState[myRole].win);
+      });
+    }
+  });
 
   useEffect(() => {
     socket.on(
       "gameContinue",
       (serverState) => {
-        console.log("gameContinue");
         const updatedState = JSON.parse(serverState);
         setGameState(updatedState);
         setTurn(updatedState.turn);
-        console.log("State after game continue", JSON.parse(serverState));
       },
       [turn]
     );
 
     socket.on("prisonerWin", (serverState) => {
       alert("prisoner win");
-      setGameState(JSON.parse(serverState));
-      setTurn(JSON.parse(serverState).turn);
+      const updatedState = JSON.parse(serverState);
+      console.log("prisoner win", updatedState);
+      console.log(socket.id);
+      const newRole =
+        socket.id === updatedState["prisoner"].id ? "prisoner" : "warder";
+      setGameState(updatedState);
+      setTurn(updatedState.turn);
+      setMyRole(newRole);
+      const winCount = updatedState[newRole].win;
+      setWinCount(winCount);
     });
 
     socket.on("warderWin", (serverState) => {
       alert("warder win");
-      setGameState(JSON.parse(serverState));
-      setTurn(JSON.parse(serverState).turn);
+      const updatedState = JSON.parse(serverState);
+      console.log("warder win", updatedState);
+      console.log(socket.id);
+      const newRole =
+        socket.id === updatedState["prisoner"].id ? "prisoner" : "warder";
+      setGameState(updatedState);
+      setTurn(updatedState.turn);
+      setMyRole(newRole);
+      const winCount = updatedState[newRole].win;
+      setWinCount(winCount);
     });
 
     socket.on("gameWinner", (serverMsg) => {
@@ -184,8 +211,9 @@ function GameArea2({ history, location }) {
 
   return (
     <div>
-      <p>Your Role is : {info.myRole}</p>
+      <p>Your Role is : {myRole}</p>
       {header}
+      <p>Win Count : {winCount}</p>
       <Turn turn={turn} />
       <div className="game-area">{gameArea}</div>
     </div>

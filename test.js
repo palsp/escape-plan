@@ -1,67 +1,78 @@
-// const GameState = require("./models/game-state");
+const CheckPos = require("./util/pos");
 
-// const res = GameState.createGameState(123);
+let gameState = {
+  prisoner: {
+    id: "123",
+    pos: {},
+    win: 0,
+  },
+  warder: {
+    id: "456",
+    pos: {},
+    win: 0,
+  },
+  tunnel: { x: 100, y: 200 },
+  blocks: [{}],
+  turn: true,
+};
 
-// console.log(res);
+const gameReset = (winner) => {
+  const starter = winner === "prisoner" ? "prisoner" : "warder";
+  gameState = swapRole(starter);
 
-// setInterval(() => {
-//   const x = Math.floor(Math.random() * 5) * 100;
-//   console.log(x);
-// }, 100);
+  //reset prisoner position
+  gameState["prisoner"].pos = CheckPos.randomPos();
 
-// let x = [
-//   { x: 1, y: 1 },
-//   { x: 2, y: 2 }
-// ];
+  // reset warder position
+  // should not equal to warder
+  while (true) {
+    const warderPos = CheckPos.randomPos();
+    if (!CheckPos.isEqualPos(warderPos, gameState["prisoner"].pos)) {
+      gameState["warder"].pos = warderPos;
+      break;
+    }
+  }
 
-// console.log(Object.is({ x: 1, y: 1 }, x[1]));
-// console.log(Object.is({ x: 2, y: 2 }, x[1]));
+  // reset tunnel position
+  // should not equal to warder's and prisoner position
+  while (true) {
+    const tunnel = CheckPos.randomPos();
+    if (
+      !CheckPos.isEqualPos(tunnel, gameState["warder"].pos) &&
+      !CheckPos.isEqualPos(tunnel, gameState["prisoner"].pos)
+    ) {
+      gameState.tunnel = tunnel;
+      break;
+    }
+  }
 
-// console.log(x);
+  // reset block position
+  const blocks = [];
+  for (let i = 0; i < 5; i++) {
+    let block = CheckPos.randomPos();
+    while (
+      CheckPos.isInArrayOf(block, blocks) ||
+      CheckPos.isEqualPos(block, gameState["warder"].pos) ||
+      CheckPos.isEqualPos(block, gameState["prisoner"].pos) ||
+      CheckPos.isEqualPos(block, gameState.tunnel)
+    ) {
+      block = CheckPos.randomPos();
+    }
+    blocks.push(block);
+  }
+  gameState.blocks = blocks;
+  return gameState;
+};
 
-// const randomPos = () => {
-//   const x = Math.floor(Math.random() * 5) * 100;
-//   const y = Math.floor(Math.random() * 5) * 100;
+const swapRole = (starter) => {
+  //   const gameState = { ...GameServer.getState(gameCode) };
+  //   const gameState = state[gameCode];
+  const helper = gameState["prisoner"].id;
+  gameState["prisoner"].id = gameState["warder"].id;
+  gameState["warder"].id = helper;
+  gameState.turn = starter === "warder" ? true : false;
+  return gameState;
+};
 
-//   return { x: x, y: y };
-// };
-// const isEqualPos = (pos1, pos2) => {
-//   return pos1.x === pos2.x && pos1.y === pos2.y;
-// };
-
-// const isInArrayOf = (pos1, Arraypos) => {
-//   let rv = false;
-//   for (let p of Arraypos) {
-//     if (isEqualPos(pos1, p)) {
-//       rv = true;
-//       break;
-//     }
-//   }
-//   return rv;
-// };
-
-// let x = [
-//   { x: 1, y: 1 },
-//   { x: 2, y: 2 }
-// ];
-
-// // console.log(isInArrayOf({ x: 1, y: 2 }, x));
-// let blocks = [];
-// for (let i = 0; i < 5; i++) {
-//   let block;
-//   while (true) {
-//     block = randomPos();
-//     // console.log("block", block);
-//     if (!isInArrayOf(block, blocks)) {
-//       blocks.push(block);
-//       break;
-//     }
-//   }
-// }
-// console.log(blocks);
-
-// const msg = "this is a test";
-
-require("dotenv").config();
-
-console.log(typeof +process.env.GRID_SIZE);
+const updatedState = gameReset("abc", "prisoner");
+console.log(updatedState);
