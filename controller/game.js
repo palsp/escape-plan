@@ -57,17 +57,20 @@ exports.validateMove = (socket, msg) => {
     gameState["warder"].win += 1;
     if (gameState["warder"].win === 3) {
       gameState = {};
-      return io.in(gameCode).emit("gameWinner", {
-        myRole: "warder",
-        winMsg: "Congratulation!!!",
-        loseMsg: "You lose!!!!!",
-      });
+      return io.in(gameCode).emit(
+        "gameWinner",
+        JSON.stringify({
+          myRole: "warder",
+          winMsg: "Congratulation!!!",
+          loseMsg: "You lose!!!!!",
+        })
+      );
     }
     const helper = gameState["warder"];
     gameState["warder"] = gameState["prisoner"];
     gameState["prisoner"] = helper;
     gameState.turn = true;
-    return io.in(gameCode).emit("warderWin", JSON.parse(gameState));
+    return io.in(gameCode).emit("warderWin", JSON.stringify(gameState));
   } else if (winner === 2) {
     // prisoner win
     gameState["prisoner"].win += 1;
@@ -84,7 +87,7 @@ exports.validateMove = (socket, msg) => {
     gameState["warder"] = gameState["prisoner"];
     gameState["prisoner"] = helper;
     gameState.turn = false;
-    return io.in(gameCode).emit("prisonerWin", JSON.parse(gameState));
+    return io.in(gameCode).emit("prisonerWin", JSON.stringify(gameState));
   }
 };
 

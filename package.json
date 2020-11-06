@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --timeout 5000",
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "client" : "npm start --prefix escapeplan-frontend",
+    "dev" : "concurrently \"npm start\" \"npm run client\""
   },
   "keywords": [],
   "author": "",
@@ -20,6 +22,7 @@
     "uniqid": "^5.2.0"
   },
   "devDependencies": {
+    "concurrently": "^5.3.0",
     "dotenv": "^8.2.0",
     "nodemon": "^2.0.6",
     "socket.io-client": "^2.3.1"

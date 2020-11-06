@@ -70,15 +70,14 @@ exports.joinGame = (socket, gameCode) => {
         // state.tunnel = randomPos();
         const tunnel = randomPos();
         if (
-          !isEqualPos(state.tunnel, state.warder) &&
-          !isEqualPos(state.tunnel, state.prisoner)
+          !isEqualPos(state.tunnel, state["warder"].pos) &&
+          !isEqualPos(state.tunnel, state["prisoner"].pos)
           //state.tunnel not equal to state.block
         ) {
           state.tunnel = tunnel;
           break;
         }
       }
-
       // check block not equal to states of tunnel/warder/prisoner
       // block must be at least 2*GRID_WIDTH distance apart
       let blocks = [];
@@ -100,7 +99,12 @@ exports.joinGame = (socket, gameCode) => {
       }
 
       state.blocks = blocks;
-
+      // console.log("--------------Final State-----------------");
+      // console.log("prisoner", state["prisoner"].pos);
+      // console.log("warder", state["warder"].pos);
+      // console.log("tunnel", state.tunnel);
+      // console.log("blocks", state.blocks);
+      // console.log("--------------------------------------------");
       const updatedState = GameServer.setState(gameCode, state);
       // console.log(updatedState);
       const rv = JSON.stringify({

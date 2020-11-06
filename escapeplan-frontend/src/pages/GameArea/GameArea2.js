@@ -7,12 +7,9 @@ import Player from "../../components/Player/Player";
 import Turn from "../../components/Turn/Turn";
 import Aux from "../../hoc/Aux";
 import "./GameArea.css";
-import server from "../../../../models/server";
 
 function GameArea2({ history, location }) {
   const info = location.state;
-  console.log("info", info);
-  console.log("info.turn", info.gameState.turn);
   const [socket, setSocket] = useState(Socket.getClient());
 
   // get properties from server
@@ -42,122 +39,70 @@ function GameArea2({ history, location }) {
       setTimer(10);
     }
   };
-
   useEffect(() => {
     checkTimeOut();
   });
 
-  const checkIfOutOfBorder = (x, y, key) => {
-    // inside border
-    if (key === "a" && x !== 0) {
-      return true;
-    }
-    if (key === "w" && y !== 400) {
-      return true;
-    }
-    if (key === "s" && y !== 0) {
-      return true;
-    }
-    if (key === "d" && x !== 400) {
-      return true;
+  const moveValidation = (keypress, pos, blocks) => {
+    let move;
+    switch (keypress) {
+      // left
+      case "a":
+        move = { x: -100, y: 0 };
+        break;
+      // up
+      case "w":
+        move = { x: 0, y: 100 };
+        break;
+      //down
+      case "s":
+        move = { x: 0, y: -100 };
+        break;
+      // right
+      case "d":
+        move = { x: 100, y: 0 };
+        break;
+      default:
+        move = { x: 0, y: 0 };
     }
 
-    // out of border
-    return false;
+    let next = { x: pos.x + move.x, y: pos.y + move.y };
+
+    let check = true;
+    // out of bound
+    if (next.x < 0 || next.y < 0 || next.x >= 500 || next.y >= 500) {
+      check = false;
+    }
+    // block collision
+    for (let b of blocks) {
+      if (b.x === next.x && b.y === next.y) {
+        check = false;
+      }
+    }
+
+    return check;
   };
 
-  const checkIfEncounterBlock = (x, y, key) => {
-    if (key === "a") {
-      let nextPos = [x - 100, y];
-      for (let i = 0; i < 5; i++) {
-        if (nextPos === [gameState.blocks[i].x, gameState.blocks[i].y]) {
-          console.log("cant move a");
-          return false;
-        }
-      }
-    }
-
-    if (key === "d") {
-      let nextPos = [x + 100, y];
-      for (let i = 0; i < 5; i++) {
-        if (nextPos === [gameState.blocks[i].x, gameState.blocks[i].y]) {
-          console.log("cant move d");
-          return false;
-        }
-      }
-    }
-
-    if (key === "w") {
-      let nextPos = [x, y + 100];
-      for (let i = 0; i < 5; i++) {
-        if (nextPos === [gameState.blocks[i].x, gameState.blocks[i].y]) {
-          console.log("cant move w");
-          return false;
-        }
-      }
-    }
-
-    if (key === "s") {
-      let nextPos = [x, y - 100];
-      for (let i = 0; i < 5; i++) {
-        if (nextPos === [gameState.blocks[i].x, gameState.blocks[i].y]) {
-          console.log("cant move s");
-          return false;
-        }
-      }
-    }
-    // block free
-    return true;
-  };
-
-  const checkIfValidMove = (x, y, key) => {
-    // valid move
-    if (checkIfOutOfBorder(x, y, key) && checkIfEncounterBlock(x, y, key)) {
-      return true;
-    }
-    // invalid move
-    return false;
-  };
-
-  const onKeyPressHandler = (e) => {
-    let validMove = false;
-    if ("awsd".includes(e.key)) {
-      console.log("keyyyyyyy", e.key);
-      // console.log("turnnnnn", turn);
-
-      // console.log("onKeyPressHandler", gameState);
-      // warder turn
-      if (turn && !validMove) {
-        // console.log("warder Move");
-        validMove = checkIfValidMove(
-          gameState.warder.pos.x,
-          gameState.warder.pos.y,
-          e.key
-        );
-      }
-
-      // prisoner turn
-      if (!turn && !validMove) {
-        // console.log("prisoner Move");
-        validMove = checkIfValidMove(
-          gameState.prisoner.pos.x,
-          gameState.prisoner.pos.y,
-          e.key
-        );
-        // console.log("is Valid ???", validMove);
-      }
-    }
-
-    if (validMove) {
-      // console.log("-0----Valid Move-0-0---0");
+  const onKeyPressHandler = (event) => {
+    // [turn] true = warder , false = prisoner
+    let role = turn ? "warder" : "prisoner";
+    console.log("turn ", role);
+    const validmove = moveValidation(
+      event.key,
+      gameState[role].pos,
+      gameState.blocks
+    );
+    console.log("validation result", validmove);
+    if (validmove) {
       let data = {
-        keyPress: e.key,
+        keyPress: event.key,
         myRole: info.myRole,
         gameCode: info.gameCode,
       };
       // console.log("data", data);
       socket.emit("validateMove", JSON.stringify(data));
-      setTurn(!turn);
+
+      return window.removeEventListener("keypress", onKeyPressHandler);
     }
   };
 
@@ -167,15 +112,20 @@ function GameArea2({ history, location }) {
     return () => {
       window.removeEventListener("keypress", onKeyPressHandler);
     };
-  }, [gameState]);
+  }, [turn, gameState]);
 
   useEffect(() => {
-    socket.on("gameContinue", (serverState) => {
-      console.log("gameContinue");
-      setGameState(JSON.parse(serverState));
-      setTurn(JSON.parse(serverState).turn);
-      console.log("turn after set from game state", turn);
-    });
+    socket.on(
+      "gameContinue",
+      (serverState) => {
+        console.log("gameContinue");
+        const updatedState = JSON.parse(serverState);
+        setGameState(updatedState);
+        setTurn(updatedState.turn);
+        console.log("State after game continue", JSON.parse(serverState));
+      },
+      [turn]
+    );
 
     socket.on("prisonerWin", (serverState) => {
       alert("prisoner win");
@@ -191,7 +141,7 @@ function GameArea2({ history, location }) {
 
     socket.on("gameWinner", (serverMsg) => {
       const msg = JSON.parse(serverMsg);
-      if (myRole === msg.myRole) {
+      if (info.myRole === msg.myRole) {
         alert(msg.winMsg);
       } else {
         alert(msg.loseMsg);
@@ -223,8 +173,8 @@ function GameArea2({ history, location }) {
 
       gameArea = (
         <Aux>
-          <Player pos={gameState.warder.pos} color="red" />
-          <Player pos={gameState.prisoner.pos} color="green" />
+          <Player pos={gameState.warder.pos} color="green" />
+          <Player pos={gameState.prisoner.pos} color="red" />
           {blocks};
           <Tunnel pos={gameState.tunnel} color="blue" />
         </Aux>
