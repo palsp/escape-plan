@@ -86,7 +86,7 @@ function GameArea2({ history, location }) {
   };
 
   useEffect(() => {
-    // console.log("[GameArea2.js] add keypress in  1st useEffect");
+    console.log("[GameArea2.js] add keypress in  1st useEffect");
     window.addEventListener("keypress", onKeyPressHandler);
 
     return () => {
@@ -101,12 +101,12 @@ function GameArea2({ history, location }) {
         console.log("[GameArea2.js] gameStart");
         const rcvState = JSON.parse(msg);
         setGameState({ ...rcvState });
-        setTurn(rcvState.turn);
-        setGameStart(true);
-        setWinCount(rcvState[myRole].win);
+        // setTurn(rcvState.turn);
+        // setGameStart(true);
+        // setWinCount(rcvState[myRole].win);
       });
     }
-  });
+  }, []);
 
   useEffect(() => {
     socket.on("gameContinue", (serverState) => {
@@ -123,7 +123,7 @@ function GameArea2({ history, location }) {
 
       setGameState({ ...updatedState });
       // console.log("last turn", turn);
-      // setTurn(updatedState.turn);
+      setTurn(updatedState.turn);
     });
 
     socket.on("warderWin", (serverState) => {
@@ -131,7 +131,7 @@ function GameArea2({ history, location }) {
       alert("warder win");
       const updatedState = JSON.parse(serverState);
       setGameState(updatedState);
-      // setTurn(updatedState.turn);
+      setTurn(updatedState.turn);
     });
 
     socket.on("gameWinner", (serverMsg) => {
@@ -142,7 +142,7 @@ function GameArea2({ history, location }) {
         alert(msg.loseMsg);
       }
     });
-  }, [gameState]);
+  }, []);
 
   useEffect(() => {
     if (gameState) {
@@ -152,7 +152,7 @@ function GameArea2({ history, location }) {
         setMyRole(newRole);
       }
     }
-  }, [gameState]);
+  });
 
   useEffect(() => {
     if (winCount && gameState) {
