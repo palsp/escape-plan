@@ -45,10 +45,8 @@ exports.validateMove = (socket, msg) => {
   // 0 = invalid move
   let message;
   if (!winner) {
-    // console.log("before game con", gameState["prisoner"].pos);
-    console.log("before shift", gameState.turn);
+    console.log("gameContinue");
     gameState.turn = !gameState.turn;
-    console.log("After shift", gameState.turn);
     return io.in(gameCode).emit("gameContinue", JSON.stringify(gameState));
   } else if (winner === 0) {
     // invalidMove
@@ -155,7 +153,7 @@ exports.gameLoop = (gameCode, player, opponent, blocks, tunnel, move, turn) => {
 const gameReset = (gameCode, winner) => {
   let gameState = GameServer.getState(gameCode);
   const starter = winner === "prisoner" ? "prisoner" : "warder";
-  gameState = swapRole(gameCode, starter);
+  gameState = swapRole(gameState, starter);
 
   //reset prisoner position
   gameState["prisoner"].pos = CheckPos.randomPos();
@@ -202,11 +200,11 @@ const gameReset = (gameCode, winner) => {
   return gameState;
 };
 
-const swapRole = (gameCode, starter) => {
-  const gameState = { ...GameServer.getState(gameCode) };
+const swapRole = (gameState, starter) => {
   const helper = gameState["prisoner"];
   gameState["prisoner"] = gameState["warder"];
   gameState["warder"] = helper;
   gameState.turn = starter === "warder" ? true : false;
+
   return gameState;
 };

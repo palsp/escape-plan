@@ -10,6 +10,9 @@ import "./GameArea.css";
 
 function GameArea2({ history, location }) {
   const info = location.state;
+
+  console.log("[GameArea2.js] rerendering..... ");
+
   const [socket, setSocket] = useState(Socket.getClient());
   // get properties from server
   // warder = true , prisoner = false
@@ -22,28 +25,7 @@ function GameArea2({ history, location }) {
 
   const [turn, setTurn] = useState();
 
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.on("gameStart", (msg) => {
-  //       const rcvState = JSON.parse(msg);
-  //       setGameState({ ...rcvState });
-  //       setTurn(rcvState.turn);
-  //       setGameStart(true);
-  //     });
-  //   }
-  // });
-
   const [timer, setTimer] = useState(10);
-
-  const checkTimeOut = () => {
-    if (timer === 0) {
-      setTurn((turn) => !turn);
-      setTimer(10);
-    }
-  };
-  useEffect(() => {
-    checkTimeOut();
-  });
 
   const moveValidation = (keypress, pos, blocks) => {
     let move;
@@ -67,9 +49,7 @@ function GameArea2({ history, location }) {
       default:
         move = { x: 0, y: 0 };
     }
-
     let next = { x: pos.x + move.x, y: pos.y + move.y };
-
     let check = true;
     // out of bound
     if (next.x < 0 || next.y < 0 || next.x >= 500 || next.y >= 500) {
@@ -81,7 +61,6 @@ function GameArea2({ history, location }) {
         check = false;
       }
     }
-
     return check;
   };
 
@@ -93,11 +72,10 @@ function GameArea2({ history, location }) {
       gameState[role].pos,
       gameState.blocks
     );
-    console.log("validation result", validmove);
     if (validmove) {
       let data = {
         keyPress: event.key,
-        myRole: info.myRole,
+        myRole: myRole,
         gameCode: info.gameCode,
       };
       // console.log("data", data);
@@ -108,16 +86,19 @@ function GameArea2({ history, location }) {
   };
 
   useEffect(() => {
+    // console.log("[GameArea2.js] add keypress in  1st useEffect");
     window.addEventListener("keypress", onKeyPressHandler);
 
     return () => {
       window.removeEventListener("keypress", onKeyPressHandler);
+      // console.log("[GameArea2.js] clean up in 1st useEffect");
     };
-  }, [turn, gameState, myRole]);
+  });
 
   useEffect(() => {
     if (socket) {
       socket.on("gameStart", (msg) => {
+        console.log("[GameArea2.js] gameStart");
         const rcvState = JSON.parse(msg);
         setGameState({ ...rcvState });
         setTurn(rcvState.turn);
@@ -128,54 +109,60 @@ function GameArea2({ history, location }) {
   });
 
   useEffect(() => {
-    socket.on(
-      "gameContinue",
-      (serverState) => {
-        const updatedState = JSON.parse(serverState);
-        setGameState(updatedState);
-        setTurn(updatedState.turn);
-      },
-      [turn]
-    );
-
-    socket.on("prisonerWin", (serverState) => {
-      alert("prisoner win");
+    socket.on("gameContinue", (serverState) => {
+      console.log("[GameArea2.js] gameContinue");
       const updatedState = JSON.parse(serverState);
-      console.log("prisoner win", updatedState);
-      console.log(socket.id);
-      const newRole =
-        socket.id === updatedState["prisoner"].id ? "prisoner" : "warder";
       setGameState(updatedState);
       setTurn(updatedState.turn);
-      setMyRole(newRole);
-      const winCount = updatedState[newRole].win;
-      setWinCount(winCount);
+    });
+
+    socket.on("prisonerWin", (serverState) => {
+      console.log("[GameArea2.js] prisonerWin");
+      alert("prisoner win");
+      const updatedState = JSON.parse(serverState);
+
+      setGameState({ ...updatedState });
+      // console.log("last turn", turn);
+      // setTurn(updatedState.turn);
     });
 
     socket.on("warderWin", (serverState) => {
+      console.log("[GameArea2.js] warderWin");
       alert("warder win");
       const updatedState = JSON.parse(serverState);
-      console.log("warder win", updatedState);
-      console.log(socket.id);
-      const newRole =
-        socket.id === updatedState["prisoner"].id ? "prisoner" : "warder";
       setGameState(updatedState);
-      setTurn(updatedState.turn);
-      setMyRole(newRole);
-      const winCount = updatedState[newRole].win;
-      setWinCount(winCount);
+      // setTurn(updatedState.turn);
     });
 
     socket.on("gameWinner", (serverMsg) => {
       const msg = JSON.parse(serverMsg);
-      if (info.myRole === msg.myRole) {
+      if (myRole === msg.myRole) {
         alert(msg.winMsg);
       } else {
         alert(msg.loseMsg);
       }
     });
-  }, []);
+  }, [gameState]);
 
+  useEffect(() => {
+    if (gameState) {
+      const newRole =
+        socket.id === gameState["prisoner"].id ? "prisoner" : "warder";
+      if (newRole !== myRole) {
+        setMyRole(newRole);
+      }
+    }
+  }, [gameState]);
+
+  useEffect(() => {
+    if (winCount && gameState) {
+      if (winCount !== gameState[myRole].win) {
+        setWinCount(gameState.win);
+      }
+    }
+  }, [myRole]);
+
+  /* ---------------------------------------------- rendering ------------------------------------------------------------------*/
   let header = null;
   if (info.gameCode) {
     header = <p> Your gamCode is : {info.gameCode}</p>;
@@ -219,5 +206,7 @@ function GameArea2({ history, location }) {
     </div>
   );
 }
+
+/* ----------------------------------------------------------------------------------------------------------------*/
 
 export default GameArea2;
