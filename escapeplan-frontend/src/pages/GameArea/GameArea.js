@@ -7,7 +7,6 @@ import Player from "../../components/Player/Player";
 import Turn from "../../components/Turn/Turn";
 import Aux from "../../hoc/Aux";
 import "./GameArea.css";
-import { set } from "mongoose";
 
 const GameArea = ({ history, location }) => {
   // const [socket, setSocket] = useState(Socket.getClient());
@@ -168,7 +167,7 @@ const GameArea = ({ history, location }) => {
         return {
           ...prevState,
           myRole: newRole,
-          turn: state.turn,
+          turn: rcvState.turn,
           gameState: rcvState,
           winCount: rcvState[newRole].win,
         };
@@ -179,8 +178,8 @@ const GameArea = ({ history, location }) => {
       const rcvState = JSON.parse(serverState);
 
       alert("warder win");
-      console.log("prisoner id", rcvState["prisoner"].id);
-      console.log("user id", state.socket.id);
+      // console.log("prisoner id", rcvState["prisoner"].id);
+      // console.log("user id", state.socket.id);
       // setGameState(state);
       // setTurn(state.turn);
 
@@ -194,7 +193,7 @@ const GameArea = ({ history, location }) => {
         return {
           ...prevState,
           myRole: newRole,
-          turn: state.turn,
+          turn: rcvState.turn,
           gameState: rcvState,
           winCount: rcvState[newRole].win,
         };
