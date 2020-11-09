@@ -7,21 +7,32 @@ import Player from "../../components/Player/Player";
 import Turn from "../../components/Turn/Turn";
 import Aux from "../../hoc/Aux";
 import "./GameArea.css";
+import { set } from "mongoose";
 
 const GameArea = ({ history, location }) => {
-  const [socket, setSocket] = useState(Socket.getClient());
+  // const [socket, setSocket] = useState(Socket.getClient());
 
-  const [gameState, setGameState] = useState();
+  // const [gameState, setGameState] = useState();
 
-  const [winCount, setWinCount] = useState(0);
+  // const [winCount, setWinCount] = useState(0);
 
-  const [myRole, setMyRole] = useState(location.state.myRole);
+  // const [myRole, setMyRole] = useState(location.state.myRole);
 
-  const [gameStart, setGameStart] = useState(false);
+  // const [gameStart, setGameStart] = useState(false);
 
-  const [turn, setTurn] = useState();
+  // const [turn, setTurn] = useState();
 
-  const [timer, setTimer] = useState(10);
+  // const [timer, setTimer] = useState(10);
+
+  const [state, setState] = useState({
+    socket: Socket.getClient(),
+    gameState: null,
+    winCount: 0,
+    myRole: location.state.myRole,
+    gameState: false,
+    turn: false,
+    timer: 10,
+  });
 
   /*  method */
 
@@ -64,20 +75,23 @@ const GameArea = ({ history, location }) => {
 
   const onKeyPressHandler = (event) => {
     // [turn] true = warder , false = prisoner
-    console.log("key", event.key);
-    let role = turn ? "warder" : "prisoner";
+
+    let role = state.turn ? "warder" : "prisoner";
+    if (state.myRole !== role) {
+      return;
+    }
     const validmove = moveValidation(
       event.key,
-      gameState[role].pos,
-      gameState.blocks
+      state.gameState[role].pos,
+      state.gameState.blocks
     );
     if (validmove) {
       let data = {
         keyPress: event.key,
-        myRole: myRole,
+        myRole: state.myRole,
         gameCode: location.state.gameCode,
       };
-      socket.emit("play", JSON.stringify(data));
+      state.socket.emit("play", JSON.stringify(data));
       // console.log("data", data);
       return window.removeEventListener("keypress", onKeyPressHandler);
     }
@@ -87,7 +101,7 @@ const GameArea = ({ history, location }) => {
 
   // run every rerendering
   useEffect(() => {
-    console.log("[gameArea2.js] add key press");
+    // console.log("[gameArea2.js] add key press");
     window.addEventListener("keypress", onKeyPressHandler);
 
     return () => {
@@ -97,62 +111,105 @@ const GameArea = ({ history, location }) => {
 
   // run only once
   useEffect(() => {
-    socket.on("gameStart", (serverState) => {
+    state.socket.on("gameStart", (serverState) => {
       console.log("gameStart");
-      const state = JSON.parse(serverState);
-      setGameState(state);
-      setTurn(state.turn);
-      setGameStart(true);
-      setWinCount(state[myRole].win);
+      const rcvState = JSON.parse(serverState);
+      // setGameState(state);
+      // setTurn(state.turn);
+      // setGameStart(true);
+      // setWinCount(state[myRole].win);
+
+      setState((prevState) => {
+        return {
+          ...prevState,
+          gameState: rcvState,
+          turn: state.turn,
+          gameStart: true,
+          winCount: rcvState[location.state.myRole].win,
+        };
+      });
     });
 
-    socket.on("updateTimer", (time) => {
-      setTimer(time);
+    state.socket.on("updateTimer", (time) => {
+      setState((prevState) => {
+        return { ...prevState, timer: time };
+      });
     });
 
-    socket.on("swithchTurn", (newTurn) => {
-      gameState.turn = newTurn;
-      setGameState(newTurn);
-      setTurn(newTurn);
+    state.socket.on("switchTurn", (newTurn) => {
+      console.log("switch", typeof newTurn);
+      // console.log(gameState);
+      // setTurn(newTurn);
+      setState((prevState) => {
+        return { ...prevState, turn: newTurn };
+      });
     });
 
-    socket.on("gameContinue", (serverState) => {
-      const state = JSON.parse(serverState);
-      setGameState(state);
-      setTurn(state.turn);
+    state.socket.on("gameContinue", (serverState) => {
+      const rcvState = JSON.parse(serverState);
+      // setGameState(state);
+      // setTurn(turn);
+      setState((prevState) => {
+        return { ...prevState, gameState: rcvState, turn: rcvState.turn };
+      });
     });
 
-    socket.on("prisonerWin", (serverState) => {
-      const state = JSON.parse(serverState);
+    state.socket.on("prisonerWin", (serverState) => {
+      const rcvState = JSON.parse(serverState);
       alert("prisoner win");
-      setGameState(state);
-      setTurn(state.turn);
+      // setGameState(state);
+      // setTurn(state.turn);
 
       const newRole =
-        state["prisoner"].id === socket.id ? "prisoner" : "warder";
-      setMyRole(newRole);
-      setWinCount(state[newRole].win);
+        rcvState["prisoner"].id === state.socket.id ? "prisoner" : "warder";
+      // setMyRole(newRole);
+      // setWinCount(state[newRole].win);
+      setState((prevState) => {
+        return {
+          ...prevState,
+          myRole: newRole,
+          turn: state.turn,
+          gameState: rcvState,
+          winCount: rcvState[newRole].win,
+        };
+      });
     });
 
-    socket.on("warderWin", (serverState) => {
-      const state = JSON.parse(serverState);
+    state.socket.on("warderWin", (serverState) => {
+      const rcvState = JSON.parse(serverState);
+
       alert("warder win");
-      setGameState(state);
-      setTurn(state.turn);
+      console.log("prisoner id", rcvState["prisoner"].id);
+      console.log("user id", state.socket.id);
+      // setGameState(state);
+      // setTurn(state.turn);
 
+      // const newRole =
+      //   state["prisoner"].id === socket.id ? "prisoner" : "warder";
+      // setMyRole(newRole);
+      // setWinCount(state[newRole].win);
       const newRole =
-        state["prisoner"].id === socket.id ? "prisoner" : "warder";
-      setMyRole(newRole);
-      setWinCount(state[newRole].win);
+        rcvState["prisoner"].id === state.socket.id ? "prisoner" : "warder";
+      setState((prevState) => {
+        return {
+          ...prevState,
+          myRole: newRole,
+          turn: state.turn,
+          gameState: rcvState,
+          winCount: rcvState[newRole].win,
+        };
+      });
     });
 
-    socket.on("gameWinner", (msg) => {
+    state.socket.on("gameWinner", (msg) => {
       msg = JSON.parse(msg);
-      if (myRole === msg.myRole) {
+      if (state.myRole === msg.myRole) {
         alert(msg.winMsg);
       } else {
         alert(msg.loseMsg);
       }
+      state.socket.disconnect();
+      history.push("/");
     });
   }, []);
 
@@ -162,10 +219,10 @@ const GameArea = ({ history, location }) => {
     header = <p> Your gamCode is : {location.state.gameCode}</p>;
   }
 
-  if (gameStart) {
+  if (state.gameStart) {
     header = (
       <Aux>
-        <Timer timer={timer} />
+        <Timer timer={state.timer} />
         {/* <Turn turn={gameState.turn} /> */}
       </Aux>
     );
@@ -173,18 +230,18 @@ const GameArea = ({ history, location }) => {
 
   let gameArea = null;
   let blocks = null;
-  if (gameState) {
-    if (gameState.warder.pos && gameState.prisoner.pos) {
-      blocks = gameState.blocks.map((block) => {
+  if (state.gameState) {
+    if (state.gameState.warder.pos && state.gameState.prisoner.pos) {
+      blocks = state.gameState.blocks.map((block) => {
         return <Blocks pos={block} color="black" />;
       });
 
       gameArea = (
         <Aux>
-          <Player pos={gameState.warder.pos} color="green" />
-          <Player pos={gameState.prisoner.pos} color="red" />
+          <Player pos={state.gameState.warder.pos} color="green" />
+          <Player pos={state.gameState.prisoner.pos} color="red" />
           {blocks};
-          <Tunnel pos={gameState.tunnel} color="blue" />
+          <Tunnel pos={state.gameState.tunnel} color="blue" />
         </Aux>
       );
     }
@@ -192,10 +249,10 @@ const GameArea = ({ history, location }) => {
 
   return (
     <div>
-      <p>Your Role is : {myRole}</p>
+      <p>Your Role is : {state.myRole}</p>
       {header}
-      <p>Win Count : {winCount}</p>
-      <Turn turn={turn} />
+      <p>Win Count : {state.winCount}</p>
+      <Turn turn={state.turn} />
       <div className="game-area">{gameArea}</div>
     </div>
   );

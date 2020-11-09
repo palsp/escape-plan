@@ -116,8 +116,8 @@ exports.joinGame = (socket, gameCode) => {
       });
 
       socket.emit("joinSuccess", rv);
-      io.in(gameCode).emit("gameStart", JSON.stringify(updatedState));
-      return io.in(gameCode).emit("gameStart", JSON.stringify(updatedState));
+      // return io.in(gameCode).emit("gameStart", JSON.stringify(updatedState));
+      // return io.in(gameCode).emit("gameStart", JSON.stringify(updatedState));
     });
   }
   return socket.emit("err", JSON.stringify({ message: errMessage }));

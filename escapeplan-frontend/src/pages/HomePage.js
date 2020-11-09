@@ -75,7 +75,7 @@ function HomePage({ history }) {
         });
       });
     }
-  });
+  }, [socket]);
 
   return (
     <div className="center">

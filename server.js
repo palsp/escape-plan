@@ -8,6 +8,10 @@ const io = require("./socket").init(server);
 const roomController = require("./controller/room");
 const gameController = require("./controller/game2");
 const GameServer = require("./models/server");
+const { gameReset } = require("./util/game");
+const { reset } = require("sinon");
+
+let timer = 10;
 
 io.on("connection", (socket) => {
   socket.emit("init", "Hello User");
@@ -16,13 +20,71 @@ io.on("connection", (socket) => {
   socket.on("createNewGame", roomController.createGame.bind(this, socket));
   socket.on("joinRoom", roomController.joinGame.bind(this, socket));
 
-  socket.on("play", gameController.play.bind(this, socket));
-  // socket.on("play", gameController.validateMove.bind(this, socket));
-  // socket.on("ready", () => {
-  //   const state = GameServer.getState(gameCode);
-  //   return io.in(gameCode).emit("gameStart", JSON.stringify(state));
-  // });
-  // socket.on("ready", gameController.gameStart.bind(this, socket));
-  // socket.on("assignBlock", gameController.assignBlock.bind(this, socket));
-  // socket.on("gameStart" , )
+  // socket.on("play", gameController.play.bind(this, socket));
+  socket.on("play", (data) => {
+    const winner = gameController.play(socket, data);
+    const gameCode = GameServer.getGameRoom(socket.id);
+    let gameState = GameServer.getState(gameCode);
+    if (!winner) {
+      // continue game
+      console.log("continue game in game loop");
+      gameState.turn = !gameState.turn;
+      // resetTimer();
+      timer = 10;
+      return io.in(gameCode).emit("gameContinue", JSON.stringify(gameState));
+    } else if (winner === 1) {
+      //  prisoner win this round
+      gameState["prisoner"].win += 1;
+      if (gameState["prisoner"].win === 3) {
+        gameState = {};
+        return io.in(gameCode).emit(
+          "gameWinner",
+          JSON.stringify({
+            myRole: "prisoner",
+            winMsg: "Congratulation!!!",
+            loseMsg: "You lose!!!!!",
+          })
+        );
+      }
+      gameState = gameReset(gameState, "prisoner");
+      // resetTimer();
+      timer = 10;
+      return io.in(gameCode).emit("prisonerWin", JSON.stringify(gameState));
+    } else if (winner === 2) {
+      // warder win this round
+      gameState["warder"].win += 1;
+      if (gameState["warder"].win === 3) {
+        gameState = {};
+        // clear game Room
+        return io.in(gameCode).emit(
+          "gameWinner",
+          JSON.stringify({
+            myRole: "warder",
+            winMsg: "Congratulation!!!",
+            loseMsg: "You lose!!!!!",
+          })
+        );
+      }
+      gameState = gameReset(gameState, "warder");
+      timer = 10;
+      return io.in(gameCode).emit("warderWin", JSON.stringify(gameState));
+    }
+  });
+
+  socket.on("ready", () => {
+    const gameCode = GameServer.getGameRoom(socket.id);
+    const gameState = GameServer.getState(gameCode);
+    io.in(gameCode).emit("gameStart", JSON.stringify(gameState));
+    console.log("user emit ready");
+
+    intervalId = setInterval(() => {
+      timer -= 1;
+      io.in(gameCode).emit("updateTimer", timer);
+      if (timer === 0) {
+        timer = 10;
+        gameState.turn = !gameState.turn;
+        io.in(gameCode).emit("switchTurn", gameState.turn);
+      }
+    }, 1000);
+  });
 });
