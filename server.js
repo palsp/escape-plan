@@ -13,13 +13,27 @@ const { reset } = require("sinon");
 
 let timer = 10;
 
-io.on("connection", (socket) => {
+let onlineUsers = 0;
+
+io.on("connection", socket => {
   socket.emit("init", "Hello User");
-  console.log("User is connected");
+  console.log("User is connected", onlineUsers);
+  onlineUsers++;
+  io.emit("onlineUsers", onlineUsers);
+
+  socket.on("disconnect", () => {
+    onlineUsers--;
+    io.emit("onlineUsers", onlineUsers);
+  });
+
+  socket.on("chatMessage", ({ name, message }) => {
+    io.emit("chatMessage", { name, message });
+  });
 
   socket.on("createNewGame", roomController.createGame.bind(this, socket));
   socket.on("joinRoom", roomController.joinGame.bind(this, socket));
 
+<<<<<<< HEAD
   // socket.on("play", gameController.play.bind(this, socket));
   socket.on("play", (data) => {
     const winner = gameController.play(socket, data);
@@ -86,5 +100,24 @@ io.on("connection", (socket) => {
         io.in(gameCode).emit("switchTurn", gameState.turn);
       }
     }, 1000);
+=======
+  socket.on("play", gameController.play.bind(this, socket));
+
+  // socket.on("play", gameController.validateMove.bind(this, socket));
+  // socket.on("ready", () => {
+  //   const state = GameServer.getState(gameCode);
+  //   return io.in(gameCode).emit("gameStart", JSON.stringify(state));
+  // });
+  // socket.on("ready", gameController.gameStart.bind(this, socket));
+  // socket.on("assignBlock", gameController.assignBlock.bind(this, socket));
+  // socket.on("gameStart" , )s
+
+  socket.on("chat message", (recipientUserName, messageContent) => {
+    //get all clients (socketIds) of recipient
+    let recipientSocketIds = userSocketIdMap.get(recipientUserName);
+    for (let socketId of recipientSocketIds) {
+      io.to(socketID).emit("new message", messageContent);
+    }
+>>>>>>> 2852650ee2e31417a3652c747f7c635da2534e54
   });
 });

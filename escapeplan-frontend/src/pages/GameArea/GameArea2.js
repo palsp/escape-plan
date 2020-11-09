@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import Musics from "../../components/Musics";
+import Chat from "../../components/Chat";
 import Socket from "../../Socket";
 import Timer from "../../components/Timer/Timer";
 import Tunnel from "../../components/Tunnel/Tunnel";
@@ -12,6 +14,7 @@ function GameArea2({ history, location }) {
   const info = location.state;
 
   const [socket, setSocket] = useState(Socket.getClient());
+
   // get properties from server
   // warder = true , prisoner = false
   const [gameState, setGameState] = useState();
@@ -62,7 +65,7 @@ function GameArea2({ history, location }) {
     return check;
   };
 
-  const onKeyPressHandler = (event) => {
+  const onKeyPressHandler = event => {
     // [turn] true = warder , false = prisoner
     let role = turn ? "warder" : "prisoner";
     const validmove = moveValidation(
@@ -74,7 +77,7 @@ function GameArea2({ history, location }) {
       let data = {
         keyPress: event.key,
         myRole: myRole,
-        gameCode: info.gameCode,
+        gameCode: info.gameCode
       };
       // console.log("data", data);
       socket.emit("validateMove", JSON.stringify(data));
@@ -95,7 +98,7 @@ function GameArea2({ history, location }) {
 
   useEffect(() => {
     if (socket) {
-      socket.on("gameStart", (msg) => {
+      socket.on("gameStart", msg => {
         console.log("[GameArea2.js] gameStart");
         const rcvState = JSON.parse(msg);
         setGameState({ ...rcvState });
@@ -107,13 +110,13 @@ function GameArea2({ history, location }) {
   }, []);
 
   useEffect(() => {
-    socket.on("gameContinue", (serverState) => {
+    socket.on("gameContinue", serverState => {
       const updatedState = JSON.parse(serverState);
       setGameState(updatedState);
       setTurn(updatedState.turn);
     });
 
-    socket.on("prisonerWin", (serverState) => {
+    socket.on("prisonerWin", serverState => {
       console.log("[GameArea2.js] prisonerWin");
       alert("prisoner win");
       const updatedState = JSON.parse(serverState);
@@ -127,7 +130,7 @@ function GameArea2({ history, location }) {
       setWinCount(updatedState[newRole].win);
     });
 
-    socket.on("warderWin", (serverState) => {
+    socket.on("warderWin", serverState => {
       console.log("[GameArea2.js] warderWin");
       alert("warder win");
       const updatedState = JSON.parse(serverState);
@@ -139,7 +142,7 @@ function GameArea2({ history, location }) {
       setWinCount(updatedState[newRole].win);
     });
 
-    socket.on("gameWinner", (serverMsg) => {
+    socket.on("gameWinner", serverMsg => {
       const msg = JSON.parse(serverMsg);
       console.log(msg);
       console.log(myRole);
@@ -188,7 +191,7 @@ function GameArea2({ history, location }) {
   let blocks = null;
   if (gameState) {
     if (gameState.warder.pos && gameState.prisoner.pos) {
-      blocks = gameState.blocks.map((block) => {
+      blocks = gameState.blocks.map(block => {
         return <Blocks pos={block} color="black" />;
       });
 
@@ -209,6 +212,10 @@ function GameArea2({ history, location }) {
       {header}
       <p>Win Count : {winCount}</p>
       <Turn turn={turn} />
+      <Musics
+        urls={["https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"]}
+      ></Musics>
+      {/* <Chat></Chat> */}
       <div className="game-area">{gameArea}</div>
     </div>
   );

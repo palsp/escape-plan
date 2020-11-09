@@ -7,8 +7,27 @@ exports.gameStart = (socket, gameCode) => {
   io.in(gameCode).emit("gameStart", JSON.stringify(gameState));
 
   let timer = 10;
+  setInterval(() => {
+    timer -= 1;
+    socket.emit("timer", timer);
+    if (timer === 0) {
+      gameState.turn = !gameState.turn;
+      // switch turn
+      timer = 10;
+    }
+  }, 1000);
 
-  exports.timeControl = (socket) => {
+  socket.on("play", state => {
+    const transformedState = JSON.parse(state);
+    const role = transformedState.myRole;
+    const move = transformedState.move;
+    const turn = gameState.turn;
+    if ((turn && role !== "warder") || (!turn && role !== "prisoner")) {
+      return;
+    }
+  });
+
+  exports.timeControl = socket => {
     const IntervalId = setInterval(() => {
       timer -= 1;
       io.in(gameCode).emit("updateTimer", timer);
