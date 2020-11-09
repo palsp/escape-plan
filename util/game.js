@@ -1,16 +1,18 @@
 const GameServer = require("../models/server");
 const Validation = require("../util/pos");
+const Socket = require("../socket");
 
 const swapRole = (gameState) => {
   const helper = gameState["prisoner"];
   gameState["prisoner"] = gameState["warder"];
   gameState["warder"] = helper;
+  return gameState;
 };
 
 const gameReset = (gameState, winner) => {
   // role of the next round starter is  the same as role of the winner of this round
   gameState.turn = winner === "warder" ? true : false;
-  swapRole(gameState);
+  gameState = swapRole(gameState);
   gameState["prisoner"].pos = Validation.randomPos();
 
   // reset warder position
@@ -51,10 +53,14 @@ const gameReset = (gameState, winner) => {
     blocks.push(block);
   }
   gameState.blocks = blocks;
+  return gameState;
 };
 
-exports.isValidMove = (player, blocks, move) => {
+const isValidMove = (player, blocks, move) => {
   // check if new move is valid( in bound and not blocks
+  console.log("player", player);
+  console.log("blocks", blocks);
+  console.log("move", move);
   let vel;
   switch (move) {
     case "a": // left
@@ -75,25 +81,27 @@ exports.isValidMove = (player, blocks, move) => {
 
   const newPos = { ...player.pos };
   newPos.x += vel.x;
-  newPos.y = vel.y;
+  newPos.y += vel.y;
 
   if (
-    newPos.x <= 0 ||
-    newPos.y <= 0 ||
+    newPos.x < 0 ||
+    newPos.y < 0 ||
     newPos.x >= +process.env.GRID_SIZE ||
     newPos.y >= +process.env.GRID_SIZE
   ) {
+    console.log("out of bound");
     return;
   }
 
   if (Validation.isInArrayOf(newPos, blocks)) {
+    console.console.log("hit block");
     return;
   }
 
   return newPos;
 };
 
-exports.isWinner = (prisoner, warder, tunnel) => {
+const isWinner = (prisoner, warder, tunnel) => {
   // null = continue , 1 = prisoner win , 2 = warder win
 
   if (prisoner.pos.x === tunnel.x && prisoner.pos.y === tunnel.y) {
@@ -110,20 +118,21 @@ exports.isWinner = (prisoner, warder, tunnel) => {
 };
 
 exports.gameLoop = (gameCode, id, move) => {
-  const gameState = GameServer.getState(gameCode);
+  let gameState = GameServer.getState(gameCode);
+  const io = Socket.getIO();
   // find current player
   let player =
     id === gameState["prisoner"].id
       ? gameState["prisoner"]
       : gameState["warder"];
-  const newMove = this.isValidMove(player, gameState.blocks, move);
-  if (!newMove) {
-    // invalid move
-    return null;
+  // console.log("game state", gameState);
+  // console.log("player", player);
+  const newMove = isValidMove(player, gameState.blocks, move);
+  if (newMove) {
+    player.pos = newMove;
   }
-  player.pos = newMove;
 
-  const winner = this.isWinner(
+  const winner = isWinner(
     gameState["prisoner"],
     gameState["warder"],
     gameState.tunnel
@@ -131,6 +140,7 @@ exports.gameLoop = (gameCode, id, move) => {
 
   if (!winner) {
     // continue game
+    console.log("continue game in game loop");
     gameState.turn = !gameState.turn;
     return io.in(gameCode).emit("gameContinue", JSON.stringify(gameState));
   } else if (winner === 1) {
@@ -141,14 +151,14 @@ exports.gameLoop = (gameCode, id, move) => {
       return io.in(gameCode).emit(
         "gameWinner",
         JSON.stringify({
-          myRole: "warder",
+          myRole: "prisoner",
           winMsg: "Congratulation!!!",
           loseMsg: "You lose!!!!!",
         })
       );
     }
-    gameReset(gameState, "prisoner");
-    return io.in(gameCode).emit("warderWin", JSON.stringify(gameState));
+    gameState = gameReset(gameState, "prisoner");
+    return io.in(gameCode).emit("prisonerWin", JSON.stringify(gameState));
   } else if (winner === 2) {
     // warder win this round
     gameState["prisoner"].win += 1;
@@ -156,12 +166,12 @@ exports.gameLoop = (gameCode, id, move) => {
       gameState = {};
       // clear game Room
       return io.in(gameCode).emit("gameWinner", {
-        myRole: "prisoner",
+        myRole: "warder",
         winMsg: "Congratulation!!!",
         loseMsg: "You lose!!!!!",
       });
     }
-    gameState = gameReset(gameCode, "prisoner");
-    return io.in(gameCode).emit("prisonerWin", JSON.stringify(gameState));
+    gameState = gameReset(gameState, "prisoner");
+    return io.in(gameCode).emit("warderWin", JSON.stringify(gameState));
   }
 };

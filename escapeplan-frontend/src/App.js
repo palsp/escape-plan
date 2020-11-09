@@ -4,9 +4,13 @@ import HomePage from "./pages/HomePage";
 import HowToPlay from "./pages/HowToPlay";
 import ServerOrClient from "./pages/ServerOrClient";
 
+<<<<<<< HEAD
 import GameArea from "./pages/GameArea/GameArea2";
 import StartOrJoin from "./pages/StartOrJoin";
 import Song from "./components/Song";
+=======
+import GameArea from "./pages/GameArea/GameArea";
+>>>>>>> 60eca29885ed39900a56720c83de2256b611bb34
 
 function App() {
   return (

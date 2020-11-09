@@ -66,6 +66,7 @@ function HomePage({ history }) {
         const gameCode = transformedInput.gameCode;
 
         // go to game area // user 2
+        socket.emit("ready", gameCode);
         history.push("/gamearea", {
           transformedInput: transformedInput,
           myRole: myRole,
