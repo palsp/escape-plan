@@ -90,7 +90,7 @@ io.on("connection", (socket) => {
     io.in(gameCode).emit("gameStart", JSON.stringify(gameState));
     console.log("user emit ready");
 
-    intervalId = setInterval(() => {
+    const intervalId = setInterval(() => {
       timer -= 1;
       io.in(gameCode).emit("updateTimer", timer);
       if (timer === 0) {
