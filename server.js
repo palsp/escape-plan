@@ -9,6 +9,7 @@ const roomController = require("./controller/room");
 const gameController = require("./controller/game2");
 const GameServer = require("./models/server");
 const { gameReset } = require("./util/game");
+const { reset } = require("sinon");
 
 let timer = 10;
 
@@ -20,9 +21,19 @@ io.on("connection", socket => {
   onlineUsers++;
   io.emit("onlineUsers", onlineUsers);
 
+  socket.on("disconnect", () => {
+    onlineUsers--;
+    io.emit("onlineUsers", onlineUsers);
+  });
+
+  socket.on("chatMessage", ({ name, message }) => {
+    io.emit("chatMessage", { name, message });
+  });
+
   socket.on("createNewGame", roomController.createGame.bind(this, socket));
   socket.on("joinRoom", roomController.joinGame.bind(this, socket));
 
+<<<<<<< HEAD
   // socket.on("play", gameController.play.bind(this, socket));
   socket.on("play", (data) => {
     const winner = gameController.play(socket, data);
