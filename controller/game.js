@@ -61,7 +61,7 @@ exports.validateMove = (socket, msg) => {
         JSON.stringify({
           myRole: "warder",
           winMsg: "Congratulation!!!",
-          loseMsg: "You lose!!!!!",
+          loseMsg: "You lose!!!!!"
         })
       );
     }
@@ -78,7 +78,7 @@ exports.validateMove = (socket, msg) => {
         JSON.stringify({
           myRole: "prisoner",
           winMsg: "Congratulation!!!",
-          loseMsg: "You lose!!!!!",
+          loseMsg: "You lose!!!!!"
         })
       );
     }

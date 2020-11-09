@@ -7,14 +7,14 @@ exports.gameStart = (socket, gameCode) => {
   setInterval(() => {
     timer -= 1;
     socket.emit("timer", timer);
-    if (timer === 1) {
+    if (timer === 0) {
       gameState.turn = !gameState.turn;
-
+      // switch turn
       timer = 10;
     }
   }, 1000);
 
-  socket.on("play", (state) => {
+  socket.on("play", state => {
     const transformedState = JSON.parse(state);
     const role = transformedState.myRole;
     const move = transformedState.move;

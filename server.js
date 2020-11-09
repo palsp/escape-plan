@@ -8,14 +8,20 @@ const io = require("./socket").init(server);
 const roomController = require("./controller/room");
 const gameController = require("./controller/game");
 
-io.on("connection", (socket) => {
+io.on("connection", socket => {
   socket.emit("init", "Hello User");
   console.log("User is connected");
+
+  socket.on("chatMessage", ({ name, message }) => {
+    io.emit("chatMessage", { name, message });
+    console.log(message);
+    console.log(name);
+  });
 
   socket.on("createNewGame", roomController.createGame.bind(this, socket));
   socket.on("joinRoom", roomController.joinGame.bind(this, socket));
 
   socket.on("validateMove", gameController.validateMove.bind(this, socket));
   // socket.on("assignBlock", gameController.assignBlock.bind(this, socket));
-  // socket.on("gameStart" , )
+  // socket.on("gameStart" , )s
 });

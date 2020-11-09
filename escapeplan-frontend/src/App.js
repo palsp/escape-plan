@@ -5,6 +5,8 @@ import HowToPlay from "./pages/HowToPlay";
 import ServerOrClient from "./pages/ServerOrClient";
 
 import GameArea from "./pages/GameArea/GameArea2";
+import StartOrJoin from "./pages/StartOrJoin";
+import Song from "./components/Song";
 
 function App() {
   return (
@@ -13,11 +15,9 @@ function App() {
         <Switch>
           <Route path="/" exact component={HomePage}></Route>
           <Route path="/gamearea" exact component={GameArea}></Route>
-          <Route
-            path="/serverorclient"
-            exact
-            component={ServerOrClient}
-          ></Route>
+          <Route path="/song" exact component={Song}></Route>
+
+          <Route path="/startorjoin" exact component={StartOrJoin}></Route>
           <Route path="/howtoplay" exact component={HowToPlay}></Route>
         </Switch>
       </BrowserRouter>
