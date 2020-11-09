@@ -11,6 +11,8 @@ function HomePage({ history }) {
 
   const [formData, updateFormData] = useState(initialFormData);
 
+  const [onlineUsers, setOnlineUsers] = useState();
+
   const newGameHandler = () => {
     console.log("[HomePage.js] newGameHandler");
     socket.emit("createNewGame");
@@ -76,6 +78,13 @@ function HomePage({ history }) {
       });
     }
   });
+  useEffect(() => {
+    if (socket) {
+      socket.on("onlineUsers", onlineUsers => {
+        setOnlineUsers(onlineUsers);
+      });
+    }
+  });
 
   return (
     <div className="center">
@@ -87,6 +96,7 @@ function HomePage({ history }) {
         <h1>Play Game</h1>
       </button>
 
+      <h1> Online users: {onlineUsers}</h1>
       <label>
         <input type="text" name="gameCode" onChange={inputHandler}></input>
       </label>

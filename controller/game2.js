@@ -7,7 +7,6 @@ exports.gameStart = (socket, gameCode) => {
   io.in(gameCode).emit("gameStart", JSON.stringify(gameState));
 
   let timer = 10;
-<<<<<<< HEAD
   setInterval(() => {
     timer -= 1;
     socket.emit("timer", timer);
@@ -26,9 +25,9 @@ exports.gameStart = (socket, gameCode) => {
     if ((turn && role !== "warder") || (!turn && role !== "prisoner")) {
       return;
     }
-=======
+  });
 
-  exports.timeControl = (socket) => {
+  exports.timeControl = socket => {
     const IntervalId = setInterval(() => {
       timer -= 1;
       socket.emit("updateTimer", timer);
@@ -52,7 +51,6 @@ exports.play = (socket, data) => {
   if ((turn && role !== "warder") || (!turn && role !== "prisoner")) {
     return;
   }
->>>>>>> 60eca29885ed39900a56720c83de2256b611bb34
 
   gameLoop(gameCode, socket.id, move);
 };
