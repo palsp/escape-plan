@@ -11,8 +11,6 @@ import "./GameArea.css";
 function GameArea2({ history, location }) {
   const info = location.state;
 
-  console.log("[GameArea2.js] rerendering..... ");
-
   const [socket, setSocket] = useState(Socket.getClient());
   // get properties from server
   // warder = true , prisoner = false
@@ -101,16 +99,15 @@ function GameArea2({ history, location }) {
         console.log("[GameArea2.js] gameStart");
         const rcvState = JSON.parse(msg);
         setGameState({ ...rcvState });
-        // setTurn(rcvState.turn);
-        // setGameStart(true);
-        // setWinCount(rcvState[myRole].win);
+        setTurn(rcvState.turn);
+        setGameStart(true);
+        setWinCount(rcvState[myRole].win);
       });
     }
   }, []);
 
   useEffect(() => {
     socket.on("gameContinue", (serverState) => {
-      console.log("[GameArea2.js] gameContinue");
       const updatedState = JSON.parse(serverState);
       setGameState(updatedState);
       setTurn(updatedState.turn);
@@ -124,6 +121,10 @@ function GameArea2({ history, location }) {
       setGameState({ ...updatedState });
       // console.log("last turn", turn);
       setTurn(updatedState.turn);
+      const newRole =
+        socket.id === updatedState["prisoner"].id ? "prisoner" : "warder";
+      setMyRole(newRole);
+      setWinCount(updatedState[newRole].win);
     });
 
     socket.on("warderWin", (serverState) => {
@@ -132,10 +133,16 @@ function GameArea2({ history, location }) {
       const updatedState = JSON.parse(serverState);
       setGameState(updatedState);
       setTurn(updatedState.turn);
+      const newRole =
+        socket.id === updatedState["prisoner"].id ? "prisoner" : "warder";
+      setMyRole(newRole);
+      setWinCount(updatedState[newRole].win);
     });
 
     socket.on("gameWinner", (serverMsg) => {
       const msg = JSON.parse(serverMsg);
+      console.log(msg);
+      console.log(myRole);
       if (myRole === msg.myRole) {
         alert(msg.winMsg);
       } else {
@@ -144,23 +151,23 @@ function GameArea2({ history, location }) {
     });
   }, []);
 
-  useEffect(() => {
-    if (gameState) {
-      const newRole =
-        socket.id === gameState["prisoner"].id ? "prisoner" : "warder";
-      if (newRole !== myRole) {
-        setMyRole(newRole);
-      }
-    }
-  });
+  // useEffect(() => {
+  //   if (gameState) {
+  //     const newRole =
+  //       socket.id === gameState["prisoner"].id ? "prisoner" : "warder";
+  //     if (newRole !== myRole) {
+  //       setMyRole(newRole);
+  //     }
+  //   }
+  // });
 
-  useEffect(() => {
-    if (winCount && gameState) {
-      if (winCount !== gameState[myRole].win) {
-        setWinCount(gameState.win);
-      }
-    }
-  }, [myRole]);
+  // useEffect(() => {
+  //   if (winCount && gameState) {
+  //     if (winCount !== gameState[myRole].win) {
+  //       setWinCount(gameState.win);
+  //     }
+  //   }
+  // }, [myRole]);
 
   /* ---------------------------------------------- rendering ------------------------------------------------------------------*/
   let header = null;

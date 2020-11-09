@@ -1,178 +1,187 @@
 import React, { useState, useEffect } from "react";
 import Socket from "../../Socket";
-import Player from "../../components/Player/Player";
 import Timer from "../../components/Timer/Timer";
+import Tunnel from "../../components/Tunnel/Tunnel";
+import Blocks from "../../components/Blocks/Blocks";
+import Player from "../../components/Player/Player";
 import Turn from "../../components/Turn/Turn";
+import Aux from "../../hoc/Aux";
 import "./GameArea.css";
 
-function GameArea({ history, location }) {
-  // --------- Game Information ----------
-
+const gameArea = ({ history, location }) => {
   const [socket, setSocket] = useState(Socket.getClient());
-  // console.log("socket", Socket.getClient());
 
-  const info = location.state;
-  const myRole = info.myRole;
+  const [gameState, setGameState] = useState();
 
-  const [posWarder, setPosWarder] = useState([0, 0]);
-  const [posPrisoner, setPosPrisoner] = useState([0, 0]);
+  const [winCount, setWinCount] = useState(0);
 
-  //--------Timer---------
+  const [myRole, setMyRole] = useState(location.state.myRole);
 
-  const [turn, setTurn] = useState(true);
-  const [timer, setTimer] = useState(10.0);
+  const [gameStart, setGameStart] = useState(false);
 
-  const checkTime = () => {
-    if (timer === 0) {
-      setTurn(!turn);
-      setTimer(10);
+  const [turn, setTurn] = useState();
+
+  const [timer, setTimer] = useState(10);
+
+  /*  method */
+  const moveValidation = (keypress, pos, blocks) => {
+    let move;
+    switch (keypress) {
+      // left
+      case "a":
+        move = { x: -100, y: 0 };
+        break;
+      // up
+      case "w":
+        move = { x: 0, y: 100 };
+        break;
+      //down
+      case "s":
+        move = { x: 0, y: -100 };
+        break;
+      // right
+      case "d":
+        move = { x: 100, y: 0 };
+        break;
+      default:
+        move = { x: 0, y: 0 };
     }
-  };
-
-  const tick = () => {
-    setTimer((prevTimer) => prevTimer - 1);
-  };
-
-  useEffect(() => {
-    checkTime();
-  });
-
-  useEffect(() => {
-    setInterval(tick, 1000);
-
-    return () => {
-      clearInterval();
-    };
-  }, []);
-
-  // -----------------------------------------------------------------------------------------------------------------------------
-
-  // -------- Game Process ------------
-
-  const [keyPress, setKeyPress] = useState("");
-
-  const onKeyPressHandler = (e) => {
-    // Warder turn
-    if (turn && timer > 0) {
-      let [x, y] = [posWarder[0], posWarder[1]];
-
-      if (e.key === "a" && x !== 0) {
-        setKeyPress(e.key);
-        setPosWarder([x - 100, y]);
-        setTurn(!turn);
-        setTimer(10);
-      }
-      if (e.key === "w" && y !== 400) {
-        setKeyPress(e.key);
-        setPosWarder([x, y + 100]);
-        setTurn(!turn);
-        setTimer(10);
-      }
-      if (e.key === "s" && y !== 0) {
-        setKeyPress(e.key);
-        setPosWarder([x, y - 100]);
-        setTurn(!turn);
-        setTimer(10);
-      }
-      if (e.key === "d" && x !== 400) {
-        setKeyPress(e.key);
-        setPosWarder([x + 100, y]);
-        setTurn(!turn);
-        setTimer(10);
-        console.log("check1", keyPress);
+    let next = { x: pos.x + move.x, y: pos.y + move.y };
+    let check = true;
+    // out of bound
+    if (next.x < 0 || next.y < 0 || next.x >= 500 || next.y >= 500) {
+      check = false;
+    }
+    // block collision
+    for (let b of blocks) {
+      if (b.x === next.x && b.y === next.y) {
+        check = false;
       }
     }
-    // Prisoner turn
-    if (!turn && timer > 0) {
-      let [x, y] = [posPrisoner[0], posPrisoner[1]];
-      if (e.key === "a" && x !== 0) {
-        setKeyPress(e.key);
-        setPosPrisoner([x - 100, y]);
-        setTurn(!turn);
-        setTimer(10);
+    return check;
+  };
+
+  const onKeyPressHandler = (event) => {
+    // [turn] true = warder , false = prisoner
+    let role = turn ? "warder" : "prisoner";
+    const validmove = moveValidation(
+      event.key,
+      gameState[role].pos,
+      gameState.blocks
+    );
+    if (validmove) {
+      let data = {
+        keyPress: event.key,
+        myRole: myRole,
+        gameCode: info.gameCode,
+      };
+      // console.log("data", data);
+      socket.emit("validateMove", JSON.stringify(data));
+
+      return window.removeEventListener("keypress", onKeyPressHandler);
+    }
+
+    /*  --------------------------------------------------------------------------------------- */
+
+    // run every rerendering
+    useEffect(() => {});
+
+    // run only once
+    useEffect(() => {
+      if (socket) {
+        socket.on("gameStart", (state) => {
+          state = JSON.parse(data);
+          setGameState(state.turn);
+          setTurn(state.turn);
+          setGameStart(true);
+          setWinCount(state["myRole"].win);
+        });
+
+        socket.on("gameContinue", (state) => {
+          state = JSON.parse(state);
+          setGameState(state);
+          setTurn(state.turn);
+        });
+
+        socket.on("prisonerWin", (state) => {
+          state = JSON.parse(state);
+          alert("prisoner win");
+          setGameState(state);
+          setTurn(state.turn);
+
+          const newRole =
+            state["prisoner"].id === socket.id ? "prisoner" : "warder";
+          setMyRole(newRole);
+          setWinCount(state[newRole].win);
+        });
+
+        socket.on("warderWin", (state) => {
+          state = JSON.parse(state);
+          alert("warder win");
+          setGameState(state);
+          setTurn(state.turn);
+
+          const newRole =
+            state["prisoner"].id === socket.id ? "prisoner" : "warder";
+          setMyRole(newRole);
+          setWinCount(state[newRole].win);
+        });
+
+        socket.on("gameWinner", (msg) => {
+          msg = JSON.parse(msg);
+          if (myRole === msg.myRole) {
+            alert(msg.winMsg);
+          } else {
+            alet(msg.loseMsg);
+          }
+        });
       }
-      if (e.key === "w" && y !== 400) {
-        setKeyPress(e.key);
-        setPosPrisoner([x, y + 100]);
-        setTurn(!turn);
-        setTimer(10);
-      }
-      if (e.key === "s" && y !== 0) {
-        setKeyPress(e.key);
-        setPosPrisoner([x, y - 100]);
-        setTurn(!turn);
-        setTimer(10);
-      }
-      if (e.key === "d" && x !== 400) {
-        setKeyPress(e.key);
-        console.log("check1", keyPress);
-        setPosPrisoner([x + 100, y]);
-        setTurn((prevState) => !prevState);
-        setTimer(10);
+    }, []);
+
+    /* rendering part */
+    let header = null;
+    if (info.gameCode) {
+      header = <p> Your gamCode is : {info.gameCode}</p>;
+    }
+
+    if (gameStart) {
+      header = (
+        <Aux>
+          <Timer timer={timer} />
+          {/* <Turn turn={gameState.turn} /> */}
+        </Aux>
+      );
+    }
+
+    let gameArea = null;
+    let blocks = null;
+    if (gameState) {
+      if (gameState.warder.pos && gameState.prisoner.pos) {
+        blocks = gameState.blocks.map((block) => {
+          return <Blocks pos={block} color="black" />;
+        });
+
+        gameArea = (
+          <Aux>
+            <Player pos={gameState.warder.pos} color="green" />
+            <Player pos={gameState.prisoner.pos} color="red" />
+            {blocks};
+            <Tunnel pos={gameState.tunnel} color="blue" />
+          </Aux>
+        );
       }
     }
-  };
 
-  const positionSet = () => {
-    // Role: Warder
-    if (myRole === "warder") {
-      setPosWarder([info.gameState.warder.pos.x, info.gameState.warder.pos.y]);
-      setPosPrisoner([0, 0]);
-
-      // Role: Prisoner
-    } else {
-      setPosWarder([0, 0]);
-      setPosPrisoner([
-        info.gameState.prisoner.pos.x,
-        info.gameState.prisoner.pos.y,
-      ]);
-    }
-  };
-
-  useEffect(() => {
-    console.log("info", info);
-    console.log("block", info.gameState.blocks);
-    console.log("tunnel", info.gameState.tunnel);
-    positionSet();
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("keydown", onKeyPressHandler);
-
-
-    socket.emit("warderMove", keyPress);
-    socket.emit("prisonerMove", keyPress);
-    setKeyPress("");
-
-    return () => {
-      window.removeEventListener("keydown", onKeyPressHandler);
-    };
-  }, [turn, posWarder, posPrisoner]);
-
-  // -----------------------------------------------------------------------------------------------------------------------------
-
-  const onClickHandler = () => {
-    history.push("/");
-  };
-  // ----------- Rendoring -----------
-  return (
-    <div>
-      <button
-        style={{ width: "100px", height: "50px" }}
-        onClick={onClickHandler}
-      >
-        <h2>back</h2>
-      </button>
-      <div className="center">
-        <br></br>
-        <br></br>
-        <Timer />
-        <br></br>
-        <Turn turn={!turn} />
-        <h2>
-          Position Prisoner X:{posPrisoner[0]}, Y:{posPrisoner[1]}
-        </h2>
+    return (
+      <div>
+        <p>Your Role is : {myRole}</p>
+        {header}
+        <p>Win Count : {winCount}</p>
+        <Turn turn={turn} />
+        <div className="game-area">{gameArea}</div>
       </div>
-    </div>
-  );
-}
+    );
+  };
+};
+
+export default gameArea;

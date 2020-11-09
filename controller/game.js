@@ -73,11 +73,14 @@ exports.validateMove = (socket, msg) => {
     if (gameState["prisoner"].win === 3) {
       gameState = {};
       // clear game Room
-      return io.in(gameCode).emit("gameWinner", {
-        myRole: "prisoner",
-        winMsg: "Congratulation!!!",
-        loseMsg: "You lose!!!!!",
-      });
+      return io.in(gameCode).emit(
+        "gameWinner",
+        JSON.stringify({
+          myRole: "prisoner",
+          winMsg: "Congratulation!!!",
+          loseMsg: "You lose!!!!!",
+        })
+      );
     }
     // const helper = gameState["warder"];
     // gameState["warder"] = gameState["prisoner"];
