@@ -8,7 +8,7 @@ import Turn from "../../components/Turn/Turn";
 import Aux from "../../hoc/Aux";
 import "./GameArea.css";
 
-const gameArea = ({ history, location }) => {
+const GameArea = ({ history, location }) => {
   const [socket, setSocket] = useState(Socket.getClient());
 
   const [gameState, setGameState] = useState();
@@ -24,6 +24,7 @@ const gameArea = ({ history, location }) => {
   const [timer, setTimer] = useState(10);
 
   /*  method */
+
   const moveValidation = (keypress, pos, blocks) => {
     let move;
     switch (keypress) {
@@ -63,6 +64,7 @@ const gameArea = ({ history, location }) => {
 
   const onKeyPressHandler = (event) => {
     // [turn] true = warder , false = prisoner
+    console.log("key", event.key);
     let role = turn ? "warder" : "prisoner";
     const validmove = moveValidation(
       event.key,
@@ -73,115 +75,130 @@ const gameArea = ({ history, location }) => {
       let data = {
         keyPress: event.key,
         myRole: myRole,
-        gameCode: info.gameCode,
+        gameCode: location.state.gameCode,
       };
+      socket.emit("play", JSON.stringify(data));
       // console.log("data", data);
-      socket.emit("validateMove", JSON.stringify(data));
-
       return window.removeEventListener("keypress", onKeyPressHandler);
     }
+  };
 
-    /*  --------------------------------------------------------------------------------------- */
+  /*  --------------------------------------------------------------------------------------- */
 
-    // run every rerendering
-    useEffect(() => {});
+  // run every rerendering
+  useEffect(() => {
+    console.log("[gameArea2.js] add key press");
+    window.addEventListener("keypress", onKeyPressHandler);
 
-    // run only once
-    useEffect(() => {
-      if (socket) {
-        socket.on("gameStart", (state) => {
-          state = JSON.parse(data);
-          setGameState(state.turn);
-          setTurn(state.turn);
-          setGameStart(true);
-          setWinCount(state["myRole"].win);
-        });
+    return () => {
+      window.removeEventListener("keypress", onKeyPressHandler);
+    };
+  });
 
-        socket.on("gameContinue", (state) => {
-          state = JSON.parse(state);
-          setGameState(state);
-          setTurn(state.turn);
-        });
+  // run only once
+  useEffect(() => {
+    socket.on("gameStart", (serverState) => {
+      console.log("gameStart");
+      const state = JSON.parse(serverState);
+      setGameState(state);
+      setTurn(state.turn);
+      setGameStart(true);
+      setWinCount(state[myRole].win);
+    });
 
-        socket.on("prisonerWin", (state) => {
-          state = JSON.parse(state);
-          alert("prisoner win");
-          setGameState(state);
-          setTurn(state.turn);
+    socket.on("updateTimer", (time) => {
+      setTimer(time);
+    });
 
-          const newRole =
-            state["prisoner"].id === socket.id ? "prisoner" : "warder";
-          setMyRole(newRole);
-          setWinCount(state[newRole].win);
-        });
+    socket.on("swithchTurn", (newTurn) => {
+      gameState.turn = newTurn;
+      setGameState(newTurn);
+      setTurn(newTurn);
+    });
 
-        socket.on("warderWin", (state) => {
-          state = JSON.parse(state);
-          alert("warder win");
-          setGameState(state);
-          setTurn(state.turn);
+    socket.on("gameContinue", (serverState) => {
+      const state = JSON.parse(serverState);
+      setGameState(state);
+      setTurn(state.turn);
+    });
 
-          const newRole =
-            state["prisoner"].id === socket.id ? "prisoner" : "warder";
-          setMyRole(newRole);
-          setWinCount(state[newRole].win);
-        });
+    socket.on("prisonerWin", (serverState) => {
+      const state = JSON.parse(serverState);
+      alert("prisoner win");
+      setGameState(state);
+      setTurn(state.turn);
 
-        socket.on("gameWinner", (msg) => {
-          msg = JSON.parse(msg);
-          if (myRole === msg.myRole) {
-            alert(msg.winMsg);
-          } else {
-            alet(msg.loseMsg);
-          }
-        });
+      const newRole =
+        state["prisoner"].id === socket.id ? "prisoner" : "warder";
+      setMyRole(newRole);
+      setWinCount(state[newRole].win);
+    });
+
+    socket.on("warderWin", (serverState) => {
+      const state = JSON.parse(serverState);
+      alert("warder win");
+      setGameState(state);
+      setTurn(state.turn);
+
+      const newRole =
+        state["prisoner"].id === socket.id ? "prisoner" : "warder";
+      setMyRole(newRole);
+      setWinCount(state[newRole].win);
+    });
+
+    socket.on("gameWinner", (msg) => {
+      msg = JSON.parse(msg);
+      if (myRole === msg.myRole) {
+        alert(msg.winMsg);
+      } else {
+        alert(msg.loseMsg);
       }
-    }, []);
+    });
+  }, []);
 
-    /* rendering part */
-    let header = null;
-    if (info.gameCode) {
-      header = <p> Your gamCode is : {info.gameCode}</p>;
-    }
+  /* rendering part */
+  let header = null;
+  if (location.state.gameCode) {
+    header = <p> Your gamCode is : {location.state.gameCode}</p>;
+  }
 
-    if (gameStart) {
-      header = (
+  if (gameStart) {
+    header = (
+      <Aux>
+        <Timer timer={timer} />
+        {/* <Turn turn={gameState.turn} /> */}
+      </Aux>
+    );
+  }
+
+  let gameArea = null;
+  let blocks = null;
+  if (gameState) {
+    if (gameState.warder.pos && gameState.prisoner.pos) {
+      blocks = gameState.blocks.map((block) => {
+        return <Blocks pos={block} color="black" />;
+      });
+
+      gameArea = (
         <Aux>
-          <Timer timer={timer} />
-          {/* <Turn turn={gameState.turn} /> */}
+          <Player pos={gameState.warder.pos} color="green" />
+          <Player pos={gameState.prisoner.pos} color="red" />
+          {blocks};
+          <Tunnel pos={gameState.tunnel} color="blue" />
         </Aux>
       );
     }
+  }
 
-    let gameArea = null;
-    let blocks = null;
-    if (gameState) {
-      if (gameState.warder.pos && gameState.prisoner.pos) {
-        blocks = gameState.blocks.map((block) => {
-          return <Blocks pos={block} color="black" />;
-        });
-
-        gameArea = (
-          <Aux>
-            <Player pos={gameState.warder.pos} color="green" />
-            <Player pos={gameState.prisoner.pos} color="red" />
-            {blocks};
-            <Tunnel pos={gameState.tunnel} color="blue" />
-          </Aux>
-        );
-      }
-    }
-
-    return (
-      <div>
-        <p>Your Role is : {myRole}</p>
-        {header}
-        <p>Win Count : {winCount}</p>
-        <Turn turn={turn} />
-        <div className="game-area">{gameArea}</div>
-      </div>
-    );
-  };
+  return (
+    <div>
+      <p>Your Role is : {myRole}</p>
+      {header}
+      <p>Win Count : {winCount}</p>
+      <Turn turn={turn} />
+      <div className="game-area">{gameArea}</div>
+    </div>
+  );
 };
 
-export default gameArea;
+export default GameArea;

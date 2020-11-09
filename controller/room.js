@@ -51,6 +51,7 @@ exports.joinGame = (socket, gameCode) => {
     return socket.join(gameCode, () => {
       // return state and role to user
       const state = GameServer.getState(gameCode);
+      GameServer.setGameRoom(socket.id, gameCode);
       const role = state.remainingRole;
       // state[role] = { id: socket.id, pos: { x: 1, y: 1 } };
       state[role].id = socket.id;
@@ -115,8 +116,8 @@ exports.joinGame = (socket, gameCode) => {
       });
 
       socket.emit("joinSuccess", rv);
+      io.in(gameCode).emit("gameStart", JSON.stringify(updatedState));
       return io.in(gameCode).emit("gameStart", JSON.stringify(updatedState));
-      // return io.in(gameCode).emit("gameStart", updatedState);
     });
   }
   return socket.emit("err", JSON.stringify({ message: errMessage }));

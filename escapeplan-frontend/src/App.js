@@ -4,7 +4,7 @@ import HomePage from "./pages/HomePage";
 import HowToPlay from "./pages/HowToPlay";
 import ServerOrClient from "./pages/ServerOrClient";
 
-import GameArea from "./pages/GameArea/GameArea2";
+import GameArea from "./pages/GameArea/GameArea";
 
 function App() {
   return (
