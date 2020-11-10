@@ -16,7 +16,6 @@ let timer = 10;
 let admins = [{ username: "pal", password: "12345" }];
 let onlineUsers = 0;
 
-<<<<<<< HEAD
 app.use(bodyParser.urlencoded());
 
 app.set("view engine", "ejs");
@@ -54,9 +53,8 @@ app.post("/admin", (req, res) => {
   }
 });
 
-app.post("/reset/:code", (req, res) => {
+app.get("/reset/:code", (req, res) => {
   const gameCode = req.params.code;
-  console.log("gameCode", gameCode);
   GameServer.setState(gameCode, {});
 
   //return to home page
@@ -64,10 +62,24 @@ app.post("/reset/:code", (req, res) => {
   res.redirect("/");
 });
 
+let clients = [];
+
 io.on("connection", (socket) => {
-=======
-io.on("connection", socket => {
->>>>>>> 9ed22c449319fe42070b3f28b834d870af9e5656
+  // tell other clients that you joined
+  socket.on("greeting", (name) => {
+    clients.push({ id: socket.id, usename: name });
+    const clientList = clients.filter((client) => socket.id !== client.id);
+    socket.broadcast.emit(
+      "userJoin",
+      JSON.stringify({ clientList: clientList })
+    );
+  });
+
+  // invited other users
+  socket.on("inviteUser", (id) => {
+    socket.to(id).emit("invite");
+  });
+
   socket.emit("init", "Hello User");
   console.log("User is connected", onlineUsers);
   onlineUsers++;
@@ -86,7 +98,7 @@ io.on("connection", socket => {
   socket.on("joinRoom", roomController.joinGame.bind(this, socket));
 
   // socket.on("play", gameController.play.bind(this, socket));
-  socket.on("play", data => {
+  socket.on("play", (data) => {
     const winner = gameController.play(socket, data);
     const gameCode = GameServer.getGameRoom(socket.id);
     let gameState = GameServer.getState(gameCode);
@@ -107,7 +119,7 @@ io.on("connection", socket => {
           JSON.stringify({
             myRole: "prisoner",
             winMsg: "Congratulation!!!",
-            loseMsg: "You lose!!!!!"
+            loseMsg: "You lose!!!!!",
           })
         );
       }
@@ -126,7 +138,7 @@ io.on("connection", socket => {
           JSON.stringify({
             myRole: "warder",
             winMsg: "Congratulation!!!",
-            loseMsg: "You lose!!!!!"
+            loseMsg: "You lose!!!!!",
           })
         );
       }
@@ -141,7 +153,7 @@ io.on("connection", socket => {
     const gameState = GameServer.getState(gameCode);
     io.in(gameCode).emit("gameStart", JSON.stringify(gameState));
     console.log("user emit ready");
-    // timer = 10;
+
     const intervalId = setInterval(() => {
       timer -= 1;
       io.in(gameCode).emit("updateTimer", timer);
