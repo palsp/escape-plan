@@ -3,8 +3,9 @@ import Song from "../components/Song/Song";
 import Music from "../components/Musics";
 import Chat from "../components/Chat/Chat";
 import opensocket from "socket.io-client";
-import Socket from "../Socket";
-import "../App.css";
+import Socket from "../../Socket";
+import "../../App.css";
+import "./HomePage.css";
 
 export const UserContext = React.createContext();
 
@@ -106,22 +107,39 @@ function HomePage({ history }) {
       </label>
       <button onClick={joinGameHandler}>Submit</button>
 
-      <br></br>
-      <button
-        style={{ width: "500px", height: "300px" }}
-        onClick={howToPlayHandler}
-      >
-        <h1>How to play</h1>
-      </button>
-      <Music
-        urls={[
-          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
-        ]}
-      />
-      <Song></Song>
-      <Chat></Chat>
+      <div className="home">
+        <div className="headctn">
+          <h1 className="welcome">Welcome to</h1>
+          <h1 className="welcome">the escape plan</h1>
+        </div>
+
+        <div className="container">
+          <button onClick={newGameHandler}>
+            <h1>Start Game</h1>
+          </button>
+
+          <br></br>
+          <button onClick={howToPlayHandler}>
+            <h1>How to play</h1>
+          </button>
+          <Music
+            urls={[
+              "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+              "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+              "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+            ]}
+          />
+          <Song></Song>
+          <Chat></Chat>
+
+          <label className="submittext">
+            <input type="text" name="gameCode" onChange={inputHandler}></input>
+
+            <br></br>
+            <button onClick={joinGameHandler}>Submit</button>
+          </label>
+        </div>
+      </div>
     </div>
   );
 }

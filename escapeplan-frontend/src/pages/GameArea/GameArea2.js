@@ -8,6 +8,8 @@ import Player from "../../components/Player/Player";
 import Turn from "../../components/Turn/Turn";
 import Aux from "../../hoc/Aux";
 import "./GameArea.css";
+import "./GameArea2.css";
+import clock from "./clock.png";
 
 function GameArea2({ history, location }) {
   const info = location.state;
@@ -173,8 +175,9 @@ function GameArea2({ history, location }) {
 
   /* ---------------------------------------------- rendering ------------------------------------------------------------------*/
   let header = null;
+
   if (info.gameCode) {
-    header = <p> Your gamCode is : {info.gameCode}</p>;
+    header = <h2> Your game code is : {info.gameCode}</h2>;
   }
 
   if (gameStart) {
@@ -206,11 +209,14 @@ function GameArea2({ history, location }) {
   }
 
   return (
-    <div>
-      <p>Your Role is : {myRole}</p>
-      {header}
-      <p>Win Count : {winCount}</p>
-      <Turn turn={turn} />
+    <div className="playhome">
+      <div className="content1">
+        <img src={clock} className="clock" width="95"></img>
+        <h3>Your Role is : {myRole}</h3>
+        {header}
+        <h3>Win Count : {winCount}</h3>
+        <Turn turn={turn} />
+      </div>
 
       <div className="game-area">{gameArea}</div>
     </div>
