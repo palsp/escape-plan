@@ -32,21 +32,21 @@ app.post("/admin", (req, res) => {
   const password = req.body.password;
 
   const adminIndex = admins.findIndex(
-    admin => admin.username === username && admin.password === password
+    (admin) => admin.username === username && admin.password === password
   );
   if (adminIndex >= 0) {
     const state = GameServer.getAllState();
 
-    const rooms = Object.keys(state).map(code => {
+    const rooms = Object.keys(state).map((code) => {
       return {
         code: code,
         prisoner: state[code]["prisoner"].id,
-        warder: state[code]["warder"].id
+        warder: state[code]["warder"].id,
       };
     });
 
     res.render("admin", {
-      rooms: rooms
+      rooms: rooms,
     });
   } else {
     res.redirect("/");
@@ -62,9 +62,6 @@ app.get("/reset/:code", (req, res) => {
   res.redirect("/");
 });
 
-<<<<<<< HEAD
-io.on("connection", socket => {
-=======
 let clients = [];
 
 io.on("connection", (socket) => {
@@ -83,7 +80,6 @@ io.on("connection", (socket) => {
     socket.to(id).emit("invite");
   });
 
->>>>>>> f30a04bf07543711a08c8d0ceb885344102cad86
   socket.emit("init", "Hello User");
   console.log("User is connected", onlineUsers);
   onlineUsers++;
