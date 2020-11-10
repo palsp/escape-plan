@@ -4,7 +4,7 @@ import { BrowserRouter, Switch, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage/HomePage";
 import HowToPlay from "./pages/HowToPlay/HowToPlay";
 import StartGame from "./pages/StartGame/StartGame";
-import GameArea from "./pages/GameArea/GameArea2";
+import GameArea from "./pages/GameArea/GameArea";
 
 import CharWarder from "./pages/CharWarder/CharWarder";
 
