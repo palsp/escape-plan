@@ -1,5 +1,5 @@
-const intervalId = setInterval(() => {
-  console.log("in interval");
-}, 1000);
+const test = { 123: "a", 456: "b", b: "123" };
 
-console.log("outside interval");
+const keys = Object.keys(test);
+
+console.log(keys);

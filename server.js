@@ -1,19 +1,67 @@
+const path = require("path");
 const express = require("express");
-
 const app = express();
 
 const server = app.listen(process.env.PORT || 5000);
 
 const io = require("./socket").init(server);
 const roomController = require("./controller/room");
-const gameController = require("./controller/game2");
+const gameController = require("./controller/game");
+// const adminController = require("./controller/admin");
 const GameServer = require("./models/server");
 const { gameReset } = require("./util/game");
-const { reset } = require("sinon");
+const bodyParser = require("body-parser");
 
 let timer = 10;
-
+let admins = [{ username: "pal", password: "12345" }];
 let onlineUsers = 0;
+
+app.use(bodyParser.urlencoded());
+
+app.set("view engine", "ejs");
+app.set("views", "views");
+
+// app.get("/", adminController.getRoom);
+
+app.get("/", (req, res) => {
+  res.render("index");
+});
+
+app.post("/admin", (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  const adminIndex = admins.findIndex(
+    (admin) => admin.username === username && admin.password === password
+  );
+  if (adminIndex >= 0) {
+    const state = GameServer.getAllState();
+
+    const rooms = Object.keys(state).map((code) => {
+      return {
+        code: code,
+        prisoner: state[code]["prisoner"].id,
+        warder: state[code]["warder"].id,
+      };
+    });
+
+    res.render("admin", {
+      rooms: rooms,
+    });
+  } else {
+    res.redirect("/");
+  }
+});
+
+app.post("/reset/:code", (req, res) => {
+  const gameCode = req.params.code;
+  console.log("gameCode", gameCode);
+  GameServer.setState(gameCode, {});
+
+  //return to home page
+  io.in(gameCode).emit("reset");
+  res.redirect("/");
+});
 
 io.on("connection", (socket) => {
   socket.emit("init", "Hello User");
