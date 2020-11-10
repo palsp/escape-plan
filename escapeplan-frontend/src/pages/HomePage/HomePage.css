@@ -43,7 +43,7 @@ h1 {
   flex-direction: column;
   align-items: center;
   height: 100vh;
-  background: url("./images/background.jpg");
+  background: url("../images/background.jpg");
   background-repeat: no-repeat;
   overflow: hidden;
   background-size: cover;
@@ -74,7 +74,6 @@ line-height: 96px;
 
 button {
   background-color: rgba(165, 196, 196, 0.87);
-  color: black;
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 }
 

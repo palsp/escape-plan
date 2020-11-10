@@ -1,9 +1,9 @@
 import React from "react";
-import "../App.css";
+import "../../App.css";
 import "./HowToPlay.css"
-import warderlogo from "./warderlogo.png"
-import prisonerlogo from "./prisonerlogo.png"
-import wasd from "./wasd.png"
+import warderlogo from "../warderlogo.png"
+import prisonerlogo from "../prisonerlogo.png"
+import wasd from "../wasd.png"
 
 function HowToPlay({ history }) {
   const onClickHandler = () => {

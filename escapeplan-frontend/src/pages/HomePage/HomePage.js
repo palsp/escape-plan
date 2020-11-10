@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import opensocket from "socket.io-client";
-import Socket from "../Socket";
-import "../App.css";
+import Socket from "../../Socket";
+import "../../App.css";
 import "./HomePage.css";
 
 export const UserContext = React.createContext();
@@ -86,7 +86,7 @@ function HomePage({ history }) {
 
     <div className="container">
       <button onClick={newGameHandler}>
-        <h1>Create Game</h1>
+        <h1>Start Game</h1>
       </button>
 
       <br></br>
