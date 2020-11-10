@@ -1,0 +1,65 @@
+.startctn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  background: url("../images/blue3.jpg");
+  background-repeat: no-repeat;
+  overflow: hidden;
+  background-size: cover;
+}
+
+.enter {
+  margin-top: 4em;
+  align-items: center;
+}
+
+input {
+  width: 2000em;
+  height: 2em;
+  margin-left: 22%;
+}
+
+.buttonn {
+  margin-top: 2em;
+
+  display: flex;
+  flex-direction: row;
+  width: calc(100%-10em);
+  height: 80vh;
+}
+
+.buttons1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 80px;
+  width: 300px;
+}
+
+.buttons2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 80px;
+  width: 300px;
+}
+
+.buttons3 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 80px;
+  width: 300px;
+}
+
+h3 {
+  font-family: "Noto Sans JP", sans-serif;
+  text-align: center;
+  font-size: 30px;
+  color: rgb(250, 250, 250);
+}
+
+.designbut {
+  border-style: none;
+}

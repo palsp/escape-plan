@@ -1,0 +1,45 @@
+.playhome {
+  padding-top: 2em;
+  margin: 0em 0em 0em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100vh;
+  background: url("./imagegamearea/tree.jpg");
+  background-repeat: no-repeat;
+  overflow: hidden;
+  background-size: cover;
+  object-fit: cover;
+  font-family: "Noto Sans JP", sans-serif;
+  text-align: center;
+  font-size: 20px;
+  text-shadow: 1em;
+  color: white;
+  font-weight: bold;
+}
+.game-area {
+  left: 50%;
+  margin-right: 5%;
+  position: absolute;
+  width: 500px;
+  height: 500px;
+
+  background-image: url("./imagegamearea/gamearea.png");
+}
+
+.content1 {
+  margin-left: 8%;
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+  background-color: rgba(102, 141, 141, 0.87);
+  border: none;
+  padding: 2em;
+  font-family: "Noto Sans JP", sans-serif;
+  text-align: center;
+  font-size: 15px;
+  color: white;
+}
+
+.img {
+  width: 10%;
+  height: auto;
+}
