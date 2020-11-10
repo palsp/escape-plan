@@ -1,7 +1,6 @@
 const GameServer = require("../models/server");
 const Validation = require("../util/pos");
 const Socket = require("../socket");
-const { resetTimer } = require("../timer");
 
 const swapRole = (gameState) => {
   const helper = gameState["prisoner"];

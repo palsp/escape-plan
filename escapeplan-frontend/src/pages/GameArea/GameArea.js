@@ -9,20 +9,6 @@ import Aux from "../../hoc/Aux";
 import "./GameArea.css";
 
 const GameArea = ({ history, location }) => {
-  // const [socket, setSocket] = useState(Socket.getClient());
-
-  // const [gameState, setGameState] = useState();
-
-  // const [winCount, setWinCount] = useState(0);
-
-  // const [myRole, setMyRole] = useState(location.state.myRole);
-
-  // const [gameStart, setGameStart] = useState(false);
-
-  // const [turn, setTurn] = useState();
-
-  // const [timer, setTimer] = useState(10);
-
   const [state, setState] = useState({
     socket: Socket.getClient(),
     gameState: null,
@@ -207,6 +193,13 @@ const GameArea = ({ history, location }) => {
       } else {
         alert(msg.loseMsg);
       }
+      state.socket.disconnect();
+      history.push("/");
+    });
+
+    state.socket.on("reset", () => {
+      alert("reset from server");
+
       state.socket.disconnect();
       history.push("/");
     });

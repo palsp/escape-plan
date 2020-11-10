@@ -6,14 +6,16 @@
   "scripts": {
     "test": "mocha --timeout 5000",
     "start": "nodemon server.js",
-    "client" : "npm start --prefix escapeplan-frontend",
-    "dev" : "concurrently \"npm start\" \"npm run client\""
+    "client": "npm start --prefix escapeplan-frontend",
+    "dev": "concurrently \"npm start\" \"npm run client\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "chai": "^4.2.0",
+    "ejs": "^3.1.5",
     "express": "^4.17.1",
     "mocha": "^8.2.0",
     "mongoose": "^5.10.10",
