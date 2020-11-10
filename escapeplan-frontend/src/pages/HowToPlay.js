@@ -1,11 +1,10 @@
 import React from "react";
 import "../App.css";
 
-function HowToPlay({ history, location }) {
+function HowToPlay({ history }) {
   const onClickHandler = () => {
     history.push("/");
   };
-  console.log("eieieiie", location.state);
 
   return (
     <div>
@@ -17,7 +16,6 @@ function HowToPlay({ history, location }) {
       </button>
 
       <div className="center">
-        {/* <h1> Passing: {location.state.id} </h1> */}
         <h1>How to play</h1>
         <b>1. lsafkmjasdl;faf</b>
         <br></br>

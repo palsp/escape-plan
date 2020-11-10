@@ -7,11 +7,11 @@ export const UserContext = React.createContext();
 
 function HomePage({ history }) {
   const [socket, setSocket] = useState(null);
-  const initialFormData = Object.freeze({
-    gameCode: "",
-  });
+  const initialFormData = Object.freeze({ gameCode: "" });
 
   const [formData, updateFormData] = useState(initialFormData);
+
+  const [onlineUsers, setOnlineUsers] = useState();
 
   const newGameHandler = () => {
     console.log("[HomePage.js] newGameHandler");
@@ -51,19 +51,38 @@ function HomePage({ history }) {
         const myRole = transformedInput.myRole;
 
         const gameState = transformedInput.state;
-        console.log(socket);
-        // go to game area
+
+        // go to game area // user 1
         history.push("/gamearea", {
           transformedInput: transformedInput,
-          gameCode: gameCode,
           myRole: myRole,
           gameState: gameState,
+          gameCode: gameCode,
         });
       });
 
       socket.on("joinSuccess", (input) => {
-        const tramsformedInput = JSON.parse(input);
-        console.log(tramsformedInput);
+        const transformedInput = JSON.parse(input);
+        const myRole = transformedInput.myRole;
+        const gameState = transformedInput.state;
+        const gameCode = transformedInput.gameCode;
+
+        // go to game area // user 2
+        socket.emit("ready", gameCode);
+        history.push("/gamearea", {
+          transformedInput: transformedInput,
+          myRole: myRole,
+          gameState: gameState,
+          gameCode: gameCode,
+        });
+      });
+    }
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("onlineUsers", (onlineUsers) => {
+        setOnlineUsers(onlineUsers);
       });
     }
   });
@@ -75,9 +94,10 @@ function HomePage({ history }) {
         style={{ width: "500px", height: "300px" }}
         onClick={newGameHandler}
       >
-        <h1>Start Game</h1>
+        <h1>Play Game</h1>
       </button>
 
+      <h1> Online users: {onlineUsers}</h1>
       <label>
         <input type="text" name="gameCode" onChange={inputHandler}></input>
       </label>

@@ -9,7 +9,6 @@ exports.createGame = (socket) => {
   const state = GameState.createGameState(socket.id);
   GameServer.setGameRoom(socket.id, gameCode);
   GameServer.setState(gameCode, state);
-  console.log("room", gameCode, "state", state);
 
   // this user role
   let currentUserRole = "prisoner";
@@ -41,7 +40,6 @@ exports.joinGame = (socket, gameCode) => {
   if (allUsers) {
     numClients = Object.keys(allUsers).length;
   }
-  console.log(numClients);
   let errMessage;
   if (numClients === 0) {
     // room is not existed
@@ -53,19 +51,31 @@ exports.joinGame = (socket, gameCode) => {
     return socket.join(gameCode, () => {
       // return state and role to user
       const state = GameServer.getState(gameCode);
+      GameServer.setGameRoom(socket.id, gameCode);
       const role = state.remainingRole;
       // state[role] = { id: socket.id, pos: { x: 1, y: 1 } };
       state[role].id = socket.id;
-      state[role].pos = randomPos();
+      opponentRole = role === "prisoner" ? "warder" : "prisoner";
+      const opponentPos = state[opponentRole].pos;
+      while (true) {
+        const newPos = randomPos();
+        if (newPos.x !== opponentPos.x && newPos.y !== opponentPos.y) {
+          state[role].pos = newPos;
+          break;
+        }
+      }
+      state[role].win = 0;
       state.remainingRole = "";
       // random tunnel pos
       while (true) {
-        state.tunnel = randomPos();
+        // state.tunnel = randomPos();
+        const tunnel = randomPos();
         if (
-          !isEqualPos(state.tunnel, state.warder) &&
-          !isEqualPos(state.tunnel, state.prisoner)
+          !isEqualPos(state.tunnel, state["warder"].pos) &&
+          !isEqualPos(state.tunnel, state["prisoner"].pos)
           //state.tunnel not equal to state.block
         ) {
+          state.tunnel = tunnel;
           break;
         }
       }
@@ -76,7 +86,13 @@ exports.joinGame = (socket, gameCode) => {
         let block;
         while (true) {
           block = randomPos();
-          if (!isInArrayOf(block, blocks)) {
+
+          if (
+            !isInArrayOf(block, blocks) &&
+            !isEqualPos(block, opponentPos) &&
+            !isEqualPos(block, state[role].pos) &&
+            !isEqualPos(block, state.tunnel)
+          ) {
             blocks.push(block);
             break;
           }
@@ -84,17 +100,25 @@ exports.joinGame = (socket, gameCode) => {
       }
 
       state.blocks = blocks;
-
+      // console.log("--------------Final State-----------------");
+      // console.log("prisoner", state["prisoner"].pos);
+      // console.log("warder", state["warder"].pos);
+      // console.log("tunnel", state.tunnel);
+      // console.log("blocks", state.blocks);
+      // console.log("--------------------------------------------");
       const updatedState = GameServer.setState(gameCode, state);
       // console.log(updatedState);
       const rv = JSON.stringify({
         message: "You are in room " + gameCode,
-        gameState: updatedState,
-        role: role,
+        state: updatedState,
+        gameCode: gameCode,
+        myRole: role,
       });
-      return socket.emit("joinSuccess", rv);
+
+      socket.emit("joinSuccess", rv);
+      // return io.in(gameCode).emit("gameStart", JSON.stringify(updatedState));
+      // return io.in(gameCode).emit("gameStart", JSON.stringify(updatedState));
     });
   }
-  console.log(errMessage);
   return socket.emit("err", JSON.stringify({ message: errMessage }));
 };
