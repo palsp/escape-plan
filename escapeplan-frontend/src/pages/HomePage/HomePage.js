@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Song from "../components/Song/Song";
-import Music from "../components/Musics";
-import Chat from "../components/Chat/Chat";
+import Song from "../../components/Song/Song";
+import Music from "../../components/Musics";
+import Chat from "../../components/Chat/Chat";
 import opensocket from "socket.io-client";
 import Socket from "../../Socket";
 import "../../App.css";
@@ -92,21 +92,15 @@ function HomePage({ history }) {
   });
 
   return (
-    <div className="center">
-      <br></br>
-      <button
-        style={{ width: "500px", height: "300px" }}
-        onClick={newGameHandler}
-      >
-        <h1>Play Game</h1>
-      </button>
-
-      <h1> Online users: {onlineUsers}</h1>
-      <label>
-        <input type="text" name="gameCode" onChange={inputHandler}></input>
-      </label>
-      <button onClick={joinGameHandler}>Submit</button>
-
+    // <div className="center">
+    //   <br></br>
+    //   {/* <button
+    //     style={{ width: "500px", height: "300px" }}
+    //     onClick={newGameHandler}
+    //   >
+    //     <h1>Play Game</h1>
+    //   </button> */}
+    <div>
       <div className="home">
         <div className="headctn">
           <h1 className="welcome">Welcome to</h1>
@@ -122,15 +116,6 @@ function HomePage({ history }) {
           <button onClick={howToPlayHandler}>
             <h1>How to play</h1>
           </button>
-          <Music
-            urls={[
-              "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-              "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-              "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
-            ]}
-          />
-          <Song></Song>
-          <Chat></Chat>
 
           <label className="submittext">
             <input type="text" name="gameCode" onChange={inputHandler}></input>
@@ -139,6 +124,19 @@ function HomePage({ history }) {
             <button onClick={joinGameHandler}>Submit</button>
           </label>
         </div>
+      </div>
+
+      <div>
+        <h1> Online users: {onlineUsers}</h1>
+        <Music
+          urls={[
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+          ]}
+        />
+        <Song></Song>
+        <Chat></Chat>
       </div>
     </div>
   );

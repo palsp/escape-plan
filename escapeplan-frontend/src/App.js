@@ -1,7 +1,5 @@
 import React from "react";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage";
-import HowToPlay from "./pages/HowToPlay";
 
 import HomePage from "./pages/HomePage/HomePage";
 import HowToPlay from "./pages/HowToPlay/HowToPlay";
