@@ -53,9 +53,8 @@ app.post("/admin", (req, res) => {
   }
 });
 
-app.post("/reset/:code", (req, res) => {
+app.get("/reset/:code", (req, res) => {
   const gameCode = req.params.code;
-  console.log("gameCode", gameCode);
   GameServer.setState(gameCode, {});
 
   //return to home page
