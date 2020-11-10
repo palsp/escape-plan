@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import Song from "../components/Song/Song";
+import Music from "../components/Musics";
+import Chat from "../components/Chat/Chat";
 import opensocket from "socket.io-client";
 import Socket from "../Socket";
 import "../App.css";
@@ -18,14 +21,14 @@ function HomePage({ history }) {
     socket.emit("createNewGame");
   };
 
-  const inputHandler = (event) => {
+  const inputHandler = event => {
     updateFormData({
       ...formData,
-      [event.target.name]: event.target.value.trim(),
+      [event.target.name]: event.target.value.trim()
     });
   };
 
-  const joinGameHandler = (event) => {
+  const joinGameHandler = event => {
     event.preventDefault();
     const gameCode = formData.gameCode;
     socket.emit("joinRoom", gameCode);
@@ -43,7 +46,7 @@ function HomePage({ history }) {
   useEffect(() => {
     if (socket) {
       console.log("here");
-      socket.on("newGame", (input) => {
+      socket.on("newGame", input => {
         const transformedInput = JSON.parse(input);
 
         const gameCode = transformedInput.gameCode;
@@ -57,11 +60,11 @@ function HomePage({ history }) {
           transformedInput: transformedInput,
           myRole: myRole,
           gameState: gameState,
-          gameCode: gameCode,
+          gameCode: gameCode
         });
       });
 
-      socket.on("joinSuccess", (input) => {
+      socket.on("joinSuccess", input => {
         const transformedInput = JSON.parse(input);
         const myRole = transformedInput.myRole;
         const gameState = transformedInput.state;
@@ -73,7 +76,7 @@ function HomePage({ history }) {
           transformedInput: transformedInput,
           myRole: myRole,
           gameState: gameState,
-          gameCode: gameCode,
+          gameCode: gameCode
         });
       });
     }
@@ -81,7 +84,7 @@ function HomePage({ history }) {
 
   useEffect(() => {
     if (socket) {
-      socket.on("onlineUsers", (onlineUsers) => {
+      socket.on("onlineUsers", onlineUsers => {
         setOnlineUsers(onlineUsers);
       });
     }
@@ -110,6 +113,15 @@ function HomePage({ history }) {
       >
         <h1>How to play</h1>
       </button>
+      <Music
+        urls={[
+          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+        ]}
+      />
+      <Song></Song>
+      <Chat></Chat>
     </div>
   );
 }

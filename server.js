@@ -15,7 +15,7 @@ let timer = 10;
 
 let onlineUsers = 0;
 
-io.on("connection", (socket) => {
+io.on("connection", socket => {
   socket.emit("init", "Hello User");
   console.log("User is connected", onlineUsers);
   onlineUsers++;
@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", roomController.joinGame.bind(this, socket));
 
   // socket.on("play", gameController.play.bind(this, socket));
-  socket.on("play", (data) => {
+  socket.on("play", data => {
     const winner = gameController.play(socket, data);
     const gameCode = GameServer.getGameRoom(socket.id);
     let gameState = GameServer.getState(gameCode);
@@ -55,7 +55,7 @@ io.on("connection", (socket) => {
           JSON.stringify({
             myRole: "prisoner",
             winMsg: "Congratulation!!!",
-            loseMsg: "You lose!!!!!",
+            loseMsg: "You lose!!!!!"
           })
         );
       }
@@ -74,7 +74,7 @@ io.on("connection", (socket) => {
           JSON.stringify({
             myRole: "warder",
             winMsg: "Congratulation!!!",
-            loseMsg: "You lose!!!!!",
+            loseMsg: "You lose!!!!!"
           })
         );
       }
@@ -89,7 +89,7 @@ io.on("connection", (socket) => {
     const gameState = GameServer.getState(gameCode);
     io.in(gameCode).emit("gameStart", JSON.stringify(gameState));
     console.log("user emit ready");
-
+    // timer = 10;
     const intervalId = setInterval(() => {
       timer -= 1;
       io.in(gameCode).emit("updateTimer", timer);

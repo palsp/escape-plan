@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Musics from "../../components/Musics";
-import Chat from "../../components/Chat";
 import Socket from "../../Socket";
 import Timer from "../../components/Timer/Timer";
 import Tunnel from "../../components/Tunnel/Tunnel";
@@ -212,10 +211,7 @@ function GameArea2({ history, location }) {
       {header}
       <p>Win Count : {winCount}</p>
       <Turn turn={turn} />
-      <Musics
-        urls={["https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"]}
-      ></Musics>
-      {/* <Chat></Chat> */}
+
       <div className="game-area">{gameArea}</div>
     </div>
   );
