@@ -7,22 +7,9 @@ import Player from "../../components/Player/Player";
 import Turn from "../../components/Turn/Turn";
 import Aux from "../../hoc/Aux";
 import "./GameArea.css";
+import clock from "./clock.png";
 
 const GameArea = ({ history, location }) => {
-  // const [socket, setSocket] = useState(Socket.getClient());
-
-  // const [gameState, setGameState] = useState();
-
-  // const [winCount, setWinCount] = useState(0);
-
-  // const [myRole, setMyRole] = useState(location.state.myRole);
-
-  // const [gameStart, setGameStart] = useState(false);
-
-  // const [turn, setTurn] = useState();
-
-  // const [timer, setTimer] = useState(10);
-
   const [state, setState] = useState({
     socket: Socket.getClient(),
     gameState: null,
@@ -210,6 +197,13 @@ const GameArea = ({ history, location }) => {
       state.socket.disconnect();
       history.push("/");
     });
+
+    state.socket.on("reset", () => {
+      alert("reset from server");
+
+      state.socket.disconnect();
+      history.push("/");
+    });
   }, []);
 
   /* rendering part */
@@ -247,11 +241,22 @@ const GameArea = ({ history, location }) => {
   }
 
   return (
-    <div>
-      <p>Your Role is : {state.myRole}</p>
-      {header}
-      <p>Win Count : {state.winCount}</p>
-      <Turn turn={state.turn} />
+    // <div>
+    //   <p>Your Role is : {state.myRole}</p>
+    //   {header}
+    //   <p>Win Count : {state.winCount}</p>
+    //   <Turn turn={state.turn} />
+    //   <div className="game-area">{gameArea}</div>
+    // </div>
+    <div className="playhome">
+      <div className="content1">
+        <img src={clock} className="clock" width="95"></img>
+        <h3>Your Role is : {state.myRole}</h3>
+        {header}
+        <h3>Win Count : {state.winCount}</h3>
+        <Turn turn={state.turn} />
+      </div>
+
       <div className="game-area">{gameArea}</div>
     </div>
   );

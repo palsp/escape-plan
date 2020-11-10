@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <body>
+        <% if(rooms.length > 0) { %> 
+            <% for ( let room of rooms) { %> 
+                    <article>
+
+                    </article>
+
+                    <h1>Prisoner:</h1>
+                    <h1><%= room.prisoner%></h1>
+                    <h1>Warder:</h1>
+                    <h1><%= room.warder %></h1>
+                    
+                    <ul class = "rooms">
+                        <h2>Room</h2>
+                        <li type="text" name="gameCode" id="demo"><%=room.code%></li>
+                    <br>
+            
+                        <a href="/reset/<%=room.code%>" class="myBtn">
+                    
+                    </ul>
+
+
+                    <article >
+                        <header >
+                            <h1>Prisoner:</h1>
+                            <p><%= room.prisoner%></p>
+                            <h1>Warder:</h1>
+                            <p><%= room.warder %></p>
+                           
+                        <div class="card__actions">
+                            <a href="/reset/<%= room.code %>" class="btn">Details</a>
+                        </div>
+                    </article>
+            <% } %> ¸
+        <% } %> 
+
+
+       
+
+</body>
+
+</html>

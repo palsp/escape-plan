@@ -4,7 +4,7 @@ import "./Player.css";
 const player = (props) => {
   return (
     <div
-      className="Player"
+      className= {props.player}
       style={{
         left: props.pos.x,
         bottom: props.pos.y,

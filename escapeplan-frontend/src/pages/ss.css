@@ -1,0 +1,151 @@
+/* ESCAPE PLAN */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100&display=swap');
+
+@media only screen and (min-width : 768px){
+    body{
+        font-size : 20px;
+    }
+    button{
+        width: 60% !important;
+    }
+    input{
+        width: calc(60% - 1em) !important;
+
+    }
+}
+
+.welcome{
+    position: absolute;
+    top: 20%;
+    left: 44%;
+    font-family: 'Noto Sans JP', sans-serif;
+    text-align: center;
+    font-size: 50px;
+    text-shadow: #FFFFFF;
+    color: #FFFFFF;
+}
+
+.toescape{
+    position: absolute;
+    top: 25%;
+    left: 41%;
+    font-family: 'Noto Sans JP', sans-serif;
+    text-align: center;
+    font-size: 50px;
+    text-shadow: #FFFFFF;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+.home{
+    height: 100vh;
+    background: url('../images/background.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+.center{
+/* width: 366px;
+height: 96px;
+left: 537px;
+top: 319px;
+
+text-transform: uppercase;
+font-style: normal;
+font-weight: normal;
+font-size: 72px;
+line-height: 96px;
+*/
+text-align: center;
+
+color: #FFFFFF; 
+
+
+}
+
+.start{
+  position: absolute;
+  top: 50%;
+  left: 45%;
+  border-radius: 20px;
+border:none;
+background-color: rgba(233, 241, 241, 0.87);
+/*  
+  background-color: #f1f1f1;
+  color: black;
+  font-size: 12px;
+  padding: 16px 30px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  text-align: center;
+  width: 215px;
+  height: 105px; */
+  font-family: 'Noto Sans JP', sans-serif;
+  /* font-style: normal;
+  font-weight: normal; */
+
+display:inline-block;
+padding:0.5em 3em;
+border:0.16em solid #FFFFFF;
+margin:0 0.3em 0.3em 0;
+box-sizing: border-box;
+text-decoration:none;
+text-transform:uppercase;
+font-weight:400;
+font-size: 11.5px;
+text-align:center;
+transition: all 0.15s;
+}
+
+.start:hover{
+    -webkit-transform: scale(1.05);/*Grows in size like Angry Birds button*/
+    -moz-transform: scale(1.05);
+    -ms-transform: scale(1.05);
+    -o-transform: scale(1.05);
+}
+
+.howto{
+position: absolute;
+top: 65%;
+left: 45%;
+display:inline-block;
+padding:0.5em 3em;
+border-radius: 20px;
+border:none;
+margin:0 0.3em 0.3em 0;
+box-sizing: border-box;
+text-decoration:none;
+text-transform:uppercase;
+background-color: rgba(233, 241, 241, 0.87);
+font-weight:400;
+font-size: 11.5px;
+text-align:center;
+transition: all 0.15s;
+font-family: 'Noto Sans JP', sans-serif;
+   
+
+}
+
+.howto:hover{
+    -webkit-transform: scale(1.05);/*Grows in size like Angry Birds button*/
+    -moz-transform: scale(1.05);
+    -ms-transform: scale(1.05);
+    -o-transform: scale(1.05);
+}
+
+.submit{
+    position: absolute;
+    top: 90%;
+    left: 56%;
+    font-size: 13px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: bolder;
+}
+
+.input{
+    position: absolute;
+    top: 80%;
+    left: 45%;
+}
