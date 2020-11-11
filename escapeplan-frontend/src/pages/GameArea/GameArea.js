@@ -24,6 +24,13 @@ const GameArea = ({ history, location }) => {
   /*  method */
 
   const moveValidation = (keypress, pos, blocks) => {
+    if (keypress === "k") {
+      setState((prevState) => {
+        return { ...prevState, destroyMode: true };
+      });
+      return;
+    }
+
     let move;
 
     switch (keypress) {
@@ -54,8 +61,14 @@ const GameArea = ({ history, location }) => {
     }
     // block collision
     for (let b of blocks) {
-      if (b.x === next.x && b.y === next.y) {
-        check = false;
+      if (state.destroyMode) {
+        if (b.x === next.x && b.y === next.y) {
+          return true;
+        }
+      } else {
+        if (b.x === next.x && b.y === next.y) {
+          check = false;
+        }
       }
     }
 
@@ -66,6 +79,7 @@ const GameArea = ({ history, location }) => {
     ) {
       check = false;
     }
+
     return check;
   };
 
@@ -87,7 +101,15 @@ const GameArea = ({ history, location }) => {
         myRole: state.myRole,
         gameCode: location.state.gameCode,
       };
-      state.socket.emit("play", JSON.stringify(data));
+
+      if (state.destroyMode) {
+        state.socket.emit("destroyblock", JSON.stringify(data));
+        setState((prevState) => {
+          return { ...prevState, destroyMode: false };
+        });
+      } else {
+        state.socket.emit("play", JSON.stringify(data));
+      }
       // console.log("data", data);
       return window.removeEventListener("keypress", onKeyPressHandler);
     }
@@ -141,6 +163,17 @@ const GameArea = ({ history, location }) => {
     state.socket.on("gameContinue", (serverState) => {
       console.log("gameState before send to server", state.gameState);
 
+      const rcvState = JSON.parse(serverState);
+      console.log("game continue", rcvState);
+      // setGameState(state);
+      // setTurn(turn);
+
+      setState((prevState) => {
+        return { ...prevState, gameState: rcvState, turn: rcvState.turn };
+      });
+    });
+
+    state.socket.on("destroyBlock", (serverState) => {
       const rcvState = JSON.parse(serverState);
       console.log("game continue", rcvState);
       // setGameState(state);

@@ -9,7 +9,7 @@ const roomController = require("./controller/room");
 const gameController = require("./controller/game");
 // const adminController = require("./controller/admin");
 const GameServer = require("./models/server");
-const { gameReset } = require("./util/game");
+const { gameReset, destroyblock } = require("./util/game");
 const bodyParser = require("body-parser");
 
 let timer = 10;
@@ -97,6 +97,27 @@ io.on("connection", (socket) => {
   socket.on("createNewGame", roomController.createGame.bind(this, socket));
   socket.on("joinRoom", roomController.joinGame.bind(this, socket));
   socket.on("requestAllRoom", roomController.getAllRoom.bind(this, socket));
+
+  socket.on("destroyblock", (data) => {
+    console.log("in destroy");
+    const transformedState = JSON.parse(data);
+    const role = transformedState.myRole;
+    const move = transformedState.keyPress;
+    const gameCode = transformedState.gameCode;
+    let gameState = GameServer.getState(gameCode);
+    const turn = gameState.turn;
+    if ((turn && role !== "warder") || (!turn && role !== "prisoner")) {
+      return;
+    }
+    const updatedState = destroyblock(gameCode, socket.id, move);
+
+    if (updatedState) {
+      gameState = updatedState;
+    }
+    gameState.turn = !gameState.turn;
+    timer = 10;
+    return io.in(gameCode).emit("destroyBlock", JSON.stringify(gameState));
+  });
 
   // socket.on("play", gameController.play.bind(this, socket));
   socket.on("play", (data) => {
