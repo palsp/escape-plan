@@ -3,6 +3,9 @@ const state = {};
 // gameRooms[socket.id] = gameCode
 const gameRooms = {};
 
+//clients[socket.id] = username
+const clients = {};
+
 module.exports = {
   setGameRoom: (id, gameCode) => {
     gameRooms[id] = gameCode;
@@ -23,5 +26,14 @@ module.exports = {
   },
   getAllState: () => {
     return state;
+  },
+
+  getAllClients: () => {
+    return clients;
+  },
+
+  setClient: (id, name) => {
+    clients[id] = name;
+    return clients;
   },
 };

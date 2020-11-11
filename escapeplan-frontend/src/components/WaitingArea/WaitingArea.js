@@ -1,10 +1,16 @@
 import React from "react";
 
-const WaitingArea = () => {
+import Client from "./Client/Client";
+const WaitingArea = (props) => {
+  console.log("in waiting area", props.list);
+  const clientList = props.list.map((client) => {
+    return <Client username={client.name} />;
+  });
+
   return (
     <div className="waiting">
       <h1>Waiting for your opponents</h1>
-      <h1>. . .</h1>
+      {clientList}
     </div>
   );
 };

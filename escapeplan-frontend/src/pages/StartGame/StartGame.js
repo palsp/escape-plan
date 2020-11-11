@@ -16,9 +16,12 @@ function StartGame({ history }) {
   const [showAllRoom, setShowAllRoom] = useState(false);
   const newGameHandler = () => {
     socket.emit("createNewGame");
+    console.log("name", username);
+    socket.emit("greeting", username);
   };
 
   const inputNameHandler = (event) => {
+    event.preventDefault();
     setUserName(event.target.value);
   };
 
@@ -32,6 +35,15 @@ function StartGame({ history }) {
 
   const findRoomHandler = () => {
     socket.emit("requestAllRoom");
+  };
+
+  const joinFromPublicRoomHandler = (code) => {
+    socket.emit("joinRoom", code);
+  };
+
+  const submitHandler = () => {
+    // console.log(username);
+    // socket.emit("greeting", username);
   };
 
   useEffect(() => {
@@ -77,9 +89,11 @@ function StartGame({ history }) {
     }
   }, [socket]);
 
-  const joinFromPublicRoomHandler = (code) => {
-    socket.emit("joinRoom", code);
-  };
+  useEffect(() => {
+    socket.on("inviteFromPlayer");
+  }, []);
+
+  let invite = null;
   let display = null;
   if (showAllRoom) {
     // console.log("publicRoom", publicRoom);
@@ -101,6 +115,7 @@ function StartGame({ history }) {
           onChange={inputNameHandler}
           value={username}
         ></input>
+        <button onClick={submitHandler}>Enter NickName</button>
       </div>
       <div className="buttonn">
         <div className="buttons1">

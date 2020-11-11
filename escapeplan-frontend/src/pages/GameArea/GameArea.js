@@ -6,6 +6,7 @@ import Blocks from "../../components/Blocks/Blocks";
 import Player from "../../components/Player/Player";
 import Turn from "../../components/Turn/Turn";
 import Aux from "../../hoc/Aux";
+import WaitingArea from "../../components/WaitingArea/WaitingArea";
 import "./GameArea.css";
 import clock from "./clock.png";
 
@@ -19,6 +20,7 @@ const GameArea = ({ history, location }) => {
     turn: true,
     timer: 10,
     destroyMode: false,
+    clientList: [],
   });
 
   /*  method */
@@ -127,9 +129,31 @@ const GameArea = ({ history, location }) => {
     };
   });
 
-  useEffect(() => {});
+  useEffect(() => {
+    state.socket.on("userJoin", (user) => {
+      const clientList = [...state.clientList];
+      clientList.push(user);
+      console.log("userJoin", clientList);
+      setState((prevState) => {
+        return { ...prevState, clientList: clientList };
+      });
+    });
+
+    state.socket.on("userList", (list) => {
+      console.log("userList");
+      // console.log("user join", list);
+      const clientList = JSON.parse(list).clientList;
+      // console.log("here", clientList);
+      setState((prevState) => {
+        return { ...prevState, clientList: clientList };
+      });
+    });
+  }, [state.clientList]);
   // run only once
   useEffect(() => {
+    console.log("use effect 1st", location.state);
+    // state.socket.emit("greeting", location.state.username);
+
     state.socket.on("gameStart", (serverState) => {
       console.log("gameStart");
       const rcvState = JSON.parse(serverState);
@@ -229,6 +253,7 @@ const GameArea = ({ history, location }) => {
       } else {
         alert(msg.loseMsg);
       }
+      state.socket.emit("endgame");
       state.socket.disconnect();
       history.push("/");
     });
@@ -258,7 +283,7 @@ const GameArea = ({ history, location }) => {
     );
   }
   let infoGame = null;
-  let gameArea = null;
+  let gameArea = <WaitingArea list={state.clientList} />;
   let blocks = null;
   if (state.gameState) {
     if (state.gameState.warder.pos && state.gameState.prisoner.pos) {
@@ -277,12 +302,12 @@ const GameArea = ({ history, location }) => {
       );
 
       gameArea = (
-        <Aux>
+        <div className="game-area">
           <Player pos={state.gameState.warder.pos} color="green" />
           <Player pos={state.gameState.prisoner.pos} color="red" />
           {blocks};
           <Tunnel pos={state.gameState.tunnel} color="blue" />
-        </Aux>
+        </div>
       );
     }
   }
@@ -296,8 +321,8 @@ const GameArea = ({ history, location }) => {
         <h3>Win Count : {state.winCount}</h3>
         <Turn turn={state.turn} />
       </div>
-
-      <div className="game-area">{gameArea}</div>
+      {gameArea}
+      {/* <div className="game-area">{gameArea}</div> */}
     </div>
   );
 };

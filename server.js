@@ -15,6 +15,9 @@ const bodyParser = require("body-parser");
 let timer = 10;
 let admins = [{ username: "pal", password: "12345" }];
 let onlineUsers = 0;
+let intervalId;
+
+const clients = {};
 
 app.use(bodyParser.urlencoded());
 
@@ -62,22 +65,37 @@ app.get("/reset/:code", (req, res) => {
   res.redirect("/");
 });
 
-let clients = [];
-
 io.on("connection", (socket) => {
   // tell other clients that you joined
-  socket.on("greeting", (name) => {
-    clients.push({ id: socket.id, usename: name });
-    const clientList = clients.filter((client) => socket.id !== client.id);
-    socket.broadcast.emit(
-      "userJoin",
-      JSON.stringify({ clientList: clientList })
-    );
+  socket.on("greeting", (username) => {
+    // const clients = GameServer.getAllClients();
+    console.log(clients);
+    clients[socket.id] = username;
+    socket.broadcast.emit("userJoin", { name: username });
+    // console.log(socket.id, Object.keys(clients));
+    let clientList = Object.keys(clients).filter((id) => {
+      return id !== socket.id;
+    });
+
+    // console.log("socket", socket.id, clients[socket.id]);
+
+    clientList = clientList.map((id) => {
+      return { name: clients[id] };
+    });
+
+    // console.log("list", clientList);
+    console.log("with name", clientList);
+    socket.emit("userList", JSON.stringify({ clientList: clientList }));
   });
 
   // invited other users
-  socket.on("inviteUser", (id) => {
-    socket.to(id).emit("invite");
+  socket.on("inviteUser", ({ name, gameCode }) => {
+    // const clients = GameServer.getAllClients();
+    const userIndex = Object.keys(clients).findIndex((id) => {
+      return clients[id] === name;
+    });
+    const id = Object.keys(clients)[userIndex];
+    socket.to(id).emit("invite", gameCode);
   });
 
   socket.on("getAllRoom", () => {});
@@ -176,7 +194,7 @@ io.on("connection", (socket) => {
     io.in(gameCode).emit("gameStart", JSON.stringify(gameState));
     console.log("user emit ready");
 
-    const intervalId = setInterval(() => {
+    intervalId = setInterval(() => {
       timer -= 1;
       io.in(gameCode).emit("updateTimer", timer);
       if (timer === 0) {
@@ -185,6 +203,11 @@ io.on("connection", (socket) => {
         io.in(gameCode).emit("switchTurn", gameState.turn);
       }
     }, 1000);
+  });
+
+  socket.on("endgame", () => {
+    clearInterval(intervalId);
+    timer = 10;
   });
 
   socket.on("chat message", (recipientUserName, messageContent) => {
