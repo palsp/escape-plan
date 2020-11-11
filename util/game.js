@@ -12,7 +12,7 @@ const swapRole = (gameState) => {
 exports.gameReset = (gameState, winner) => {
   // const gameReset = (gameState, winner) => {
   // role of the next round starter is  the same as role of the winner of this round
-  gameState.turn = winner === "warder" ? true : false;
+  gameState.turn = winner === "warder" ? false : true;
   console.log("before swap", gameState);
   gameState = swapRole(gameState);
   console.log("after swap", gameState);

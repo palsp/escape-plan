@@ -1,0 +1,34 @@
+.room {
+  margin-bottom: 2em;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+}
+
+.room1 {
+  margin-top: 2em;
+  display: flex;
+  background-color: rgba(112, 141, 141, 0.87);
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+  width: 20em;
+  height: 5em;
+}
+
+.pleft {
+  margin-top: 1.5em;
+  margin-left: 2em;
+  text-align: left;
+  text-shadow: 1em;
+  color: antiquewhite;
+  font-weight: bolder;
+}
+
+.pright {
+  margin-top: 1.5em;
+
+  text-align: left;
+  text-shadow: 1em;
+  color: antiquewhite;
+  font-weight: bolder;
+}

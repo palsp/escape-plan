@@ -16,7 +16,7 @@ const GameArea = ({ history, location }) => {
     winCount: 0,
     myRole: location.state.myRole,
     gameState: false,
-    turn: false,
+    turn: true,
     timer: 10,
   });
 
@@ -209,7 +209,7 @@ const GameArea = ({ history, location }) => {
   /* rendering part */
   let header = null;
   if (location.state.gameCode) {
-    header = <p> Your gamCode is : {location.state.gameCode}</p>;
+    header = <p> Your gameCode is : {location.state.gameCode}</p>;
   }
 
   if (state.gameStart) {
@@ -220,7 +220,7 @@ const GameArea = ({ history, location }) => {
       </Aux>
     );
   }
-
+  let infoGame = null;
   let gameArea = null;
   let blocks = null;
   if (state.gameState) {
@@ -228,6 +228,16 @@ const GameArea = ({ history, location }) => {
       blocks = state.gameState.blocks.map((block) => {
         return <Blocks pos={block} color="black" />;
       });
+
+      infoGame = (
+        <div className="content1">
+          <img src={clock} className="clock" width="95"></img>
+          <h3>Your Role is : {state.myRole}</h3>
+          {header}
+          <h3>Win Count : {state.winCount}</h3>
+          <Turn turn={state.turn} />
+        </div>
+      );
 
       gameArea = (
         <Aux>
@@ -241,22 +251,7 @@ const GameArea = ({ history, location }) => {
   }
 
   return (
-    // <div>
-    //   <p>Your Role is : {state.myRole}</p>
-    //   {header}
-    //   <p>Win Count : {state.winCount}</p>
-    //   <Turn turn={state.turn} />
-    //   <div className="game-area">{gameArea}</div>
-    // </div>
     <div className="playhome">
-      <div className="content1">
-        <img src={clock} className="clock" width="95"></img>
-        <h3>Your Role is : {state.myRole}</h3>
-        {header}
-        <h3>Win Count : {state.winCount}</h3>
-        <Turn turn={state.turn} />
-      </div>
-
       <div className="game-area">{gameArea}</div>
     </div>
   );

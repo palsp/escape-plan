@@ -1,0 +1,10 @@
+.publicctn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  /* background: url("../images/blue1.jpg"); */
+  background-repeat: no-repeat;
+  overflow: hidden;
+  background-size: cover;
+}

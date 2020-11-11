@@ -80,7 +80,7 @@ io.on("connection", (socket) => {
     socket.to(id).emit("invite");
   });
 
-  socket.emit("init", "Hello User");
+  socket.on("getAllRoom", () => {});
   console.log("User is connected", onlineUsers);
   onlineUsers++;
   io.emit("onlineUsers", onlineUsers);
