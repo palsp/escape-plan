@@ -7,6 +7,7 @@ import StartGame from "./pages/StartGame/StartGame";
 import GameArea from "./pages/GameArea/GameArea";
 // import Timer2 from "./components/Timer2/Timer2";
 import CharWarder from "./pages/CharWarder/CharWarder";
+import Test from "./components/Test";
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
           <Route path="/startgame" exact component={StartGame}></Route>
           <Route path="/gamearea" exact component={GameArea}></Route>
           {/* <Route path="/song" exact component={Song}></Route> */}
-
+          <Route path="/test" exact component={Test}></Route>
           <Route path="/charwarder" exact component={CharWarder}></Route>
           {/* <Route path="/timer" exact component={Timer2}></Route> */}
 
