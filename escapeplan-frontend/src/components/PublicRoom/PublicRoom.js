@@ -6,34 +6,26 @@ import Room from "./Room/Room";
 import game from "./game.png";
 
 function PublicRoom(props) {
+  let rooms = props.rooms.map((room, index) => {
+    return (
+      <Room
+        key={index}
+        room={index + 1}
+        code={room.code}
+        numPlayer={room.numClients}
+        clicked={props.join}
+      />
+    );
+  });
+  console.log("in public room", props.rooms);
+
   return (
     <div className="publicctn">
+      {/* <div> */}
       <div className="enter">
         <h1 className="welcome">Public Room</h1>
       </div>
-      <Room />
-      <Room />
-      <Room />
-
-      {/* <div className="room">
-        <div className="room1">
-          <p className="pleft">Room1</p>
-          <img src={game} className="game" width="95"></img>
-          <p className="pright">0/1</p>
-        </div>
-
-        <div className="room1">
-          <p className="pleft">Room2</p>
-          <img src={game} className="game" width="95"></img>
-          <p className="pright">0/2</p>
-        </div>
-
-        <div className="room1">
-          <p className="pleft">Room3</p>
-          <img src={game} className="game" width="95"></img>
-          <p className="pright">1/1</p>
-        </div> */}
-      {/* </div> */}
+      {rooms}
     </div>
   );
 }

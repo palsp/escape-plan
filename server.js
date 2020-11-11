@@ -96,6 +96,7 @@ io.on("connection", (socket) => {
 
   socket.on("createNewGame", roomController.createGame.bind(this, socket));
   socket.on("joinRoom", roomController.joinGame.bind(this, socket));
+  socket.on("requestAllRoom", roomController.getAllRoom.bind(this, socket));
 
   // socket.on("play", gameController.play.bind(this, socket));
   socket.on("play", (data) => {

@@ -30,13 +30,9 @@ function StartGame({ history }) {
     socket.emit("joinRoom", gameCode);
   };
 
-  const showPublicRoomHandler = () => {
-    setShowAllRoom(true);
+  const findRoomHandler = () => {
+    socket.emit("requestAllRoom");
   };
-
-  useEffect(() => {
-    setShowAllRoom(false);
-  }, []);
 
   useEffect(() => {
     if (socket) {
@@ -76,16 +72,25 @@ function StartGame({ history }) {
 
       socket.on("getAllRoom", (input) => {
         setPublicRoom(JSON.parse(input).rooms);
+        setShowAllRoom(true);
       });
     }
   }, [socket]);
 
-  let display;
+  const joinFromPublicRoomHandler = (code) => {
+    socket.emit("joinRoom", code);
+  };
+  let display = null;
   if (showAllRoom) {
-    display = <PublicRoom />;
+    // console.log("publicRoom", publicRoom);
+    display = (
+      <PublicRoom rooms={publicRoom} join={joinFromPublicRoomHandler} />
+    );
   }
   return (
     <div className="startctn">
+      {display}
+
       <div className="enter">
         <h1 className="welcome">Enter Your Name</h1>
         <br></br>
@@ -111,7 +116,7 @@ function StartGame({ history }) {
           <h3>Public Room</h3>
           <img src={publicpic} className="host" width="95"></img>
           <br></br>
-          <button className="designbut" onClick={showPublicRoomHandler}>
+          <button className="designbut" onClick={findRoomHandler}>
             Find Game
           </button>
         </div>
@@ -135,7 +140,6 @@ function StartGame({ history }) {
           </label>
         </div>
       </div>
-      {display}
     </div>
   );
 }

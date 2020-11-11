@@ -3,7 +3,7 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  height: 80vh;
+  /* height: 80vh; */
 }
 
 .room1 {
@@ -25,9 +25,11 @@
 }
 
 .pright {
+  float: right;
   margin-top: 1.5em;
-
-  text-align: left;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
   text-shadow: 1em;
   color: antiquewhite;
   font-weight: bolder;
