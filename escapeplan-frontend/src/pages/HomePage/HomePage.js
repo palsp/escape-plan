@@ -22,6 +22,10 @@ function HomePage({ history }) {
     socket.emit("createNewGame");
   };
 
+  const startGameHandler = () => {
+    history.push("/startgame");
+  };
+
   const inputHandler = event => {
     updateFormData({
       ...formData,
@@ -92,14 +96,6 @@ function HomePage({ history }) {
   });
 
   return (
-    // <div className="center">
-    //   <br></br>
-    //   {/* <button
-    //     style={{ width: "500px", height: "300px" }}
-    //     onClick={newGameHandler}
-    //   >
-    //     <h1>Play Game</h1>
-    //   </button> */}
     <div>
       <div className="home">
         <div className="headctn">
@@ -112,7 +108,10 @@ function HomePage({ history }) {
             <h1>Start Game</h1>
           </button>
 
-          <br></br>
+          <button onClick={startGameHandler}>
+            <h1>Start Game 2222</h1>
+          </button>
+
           <button onClick={howToPlayHandler}>
             <h1>How to play</h1>
           </button>
@@ -120,7 +119,6 @@ function HomePage({ history }) {
           <label className="submittext">
             <input type="text" name="gameCode" onChange={inputHandler}></input>
 
-            <br></br>
             <button onClick={joinGameHandler}>Submit</button>
           </label>
         </div>

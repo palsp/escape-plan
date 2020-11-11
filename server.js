@@ -62,16 +62,13 @@ app.get("/reset/:code", (req, res) => {
   res.redirect("/");
 });
 
-<<<<<<< HEAD
-io.on("connection", socket => {
-=======
 let clients = [];
 
-io.on("connection", (socket) => {
+io.on("connection", socket => {
   // tell other clients that you joined
-  socket.on("greeting", (name) => {
+  socket.on("greeting", name => {
     clients.push({ id: socket.id, usename: name });
-    const clientList = clients.filter((client) => socket.id !== client.id);
+    const clientList = clients.filter(client => socket.id !== client.id);
     socket.broadcast.emit(
       "userJoin",
       JSON.stringify({ clientList: clientList })
@@ -79,11 +76,10 @@ io.on("connection", (socket) => {
   });
 
   // invited other users
-  socket.on("inviteUser", (id) => {
+  socket.on("inviteUser", id => {
     socket.to(id).emit("invite");
   });
 
->>>>>>> f30a04bf07543711a08c8d0ceb885344102cad86
   socket.emit("init", "Hello User");
   console.log("User is connected", onlineUsers);
   onlineUsers++;
@@ -102,7 +98,7 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", roomController.joinGame.bind(this, socket));
 
   // socket.on("play", gameController.play.bind(this, socket));
-  socket.on("play", (data) => {
+  socket.on("play", data => {
     const winner = gameController.play(socket, data);
     const gameCode = GameServer.getGameRoom(socket.id);
     let gameState = GameServer.getState(gameCode);
@@ -123,7 +119,7 @@ io.on("connection", (socket) => {
           JSON.stringify({
             myRole: "prisoner",
             winMsg: "Congratulation!!!",
-            loseMsg: "You lose!!!!!",
+            loseMsg: "You lose!!!!!"
           })
         );
       }
@@ -142,7 +138,7 @@ io.on("connection", (socket) => {
           JSON.stringify({
             myRole: "warder",
             winMsg: "Congratulation!!!",
-            loseMsg: "You lose!!!!!",
+            loseMsg: "You lose!!!!!"
           })
         );
       }

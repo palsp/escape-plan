@@ -6,6 +6,7 @@ import Blocks from "../../components/Blocks/Blocks";
 import Player from "../../components/Player/Player";
 import Turn from "../../components/Turn/Turn";
 import Aux from "../../hoc/Aux";
+import clock from "./clock.png";
 import "./GameArea.css";
 
 const GameArea = ({ history, location }) => {
@@ -16,7 +17,7 @@ const GameArea = ({ history, location }) => {
     myRole: location.state.myRole,
     gameState: false,
     turn: false,
-    timer: 10,
+    timer: 10
   });
 
   /*  method */
@@ -58,7 +59,7 @@ const GameArea = ({ history, location }) => {
     return check;
   };
 
-  const onKeyPressHandler = (event) => {
+  const onKeyPressHandler = event => {
     // [turn] true = warder , false = prisoner
 
     let role = state.turn ? "warder" : "prisoner";
@@ -74,7 +75,7 @@ const GameArea = ({ history, location }) => {
       let data = {
         keyPress: event.key,
         myRole: state.myRole,
-        gameCode: location.state.gameCode,
+        gameCode: location.state.gameCode
       };
       state.socket.emit("play", JSON.stringify(data));
       // console.log("data", data);
@@ -96,7 +97,7 @@ const GameArea = ({ history, location }) => {
 
   // run only once
   useEffect(() => {
-    state.socket.on("gameStart", (serverState) => {
+    state.socket.on("gameStart", serverState => {
       console.log("gameStart");
       const rcvState = JSON.parse(serverState);
       // setGameState(state);
@@ -104,42 +105,42 @@ const GameArea = ({ history, location }) => {
       // setGameStart(true);
       // setWinCount(state[myRole].win);
 
-      setState((prevState) => {
+      setState(prevState => {
         return {
           ...prevState,
           gameState: rcvState,
           turn: state.turn,
           gameStart: true,
-          winCount: rcvState[location.state.myRole].win,
+          winCount: rcvState[location.state.myRole].win
         };
       });
     });
 
-    state.socket.on("updateTimer", (time) => {
-      setState((prevState) => {
+    state.socket.on("updateTimer", time => {
+      setState(prevState => {
         return { ...prevState, timer: time };
       });
     });
 
-    state.socket.on("switchTurn", (newTurn) => {
+    state.socket.on("switchTurn", newTurn => {
       console.log("switch", typeof newTurn);
       // console.log(gameState);
       // setTurn(newTurn);
-      setState((prevState) => {
+      setState(prevState => {
         return { ...prevState, turn: newTurn };
       });
     });
 
-    state.socket.on("gameContinue", (serverState) => {
+    state.socket.on("gameContinue", serverState => {
       const rcvState = JSON.parse(serverState);
       // setGameState(state);
       // setTurn(turn);
-      setState((prevState) => {
+      setState(prevState => {
         return { ...prevState, gameState: rcvState, turn: rcvState.turn };
       });
     });
 
-    state.socket.on("prisonerWin", (serverState) => {
+    state.socket.on("prisonerWin", serverState => {
       const rcvState = JSON.parse(serverState);
       alert("prisoner win");
       // setGameState(state);
@@ -149,18 +150,18 @@ const GameArea = ({ history, location }) => {
         rcvState["prisoner"].id === state.socket.id ? "prisoner" : "warder";
       // setMyRole(newRole);
       // setWinCount(state[newRole].win);
-      setState((prevState) => {
+      setState(prevState => {
         return {
           ...prevState,
           myRole: newRole,
           turn: rcvState.turn,
           gameState: rcvState,
-          winCount: rcvState[newRole].win,
+          winCount: rcvState[newRole].win
         };
       });
     });
 
-    state.socket.on("warderWin", (serverState) => {
+    state.socket.on("warderWin", serverState => {
       const rcvState = JSON.parse(serverState);
 
       alert("warder win");
@@ -175,18 +176,18 @@ const GameArea = ({ history, location }) => {
       // setWinCount(state[newRole].win);
       const newRole =
         rcvState["prisoner"].id === state.socket.id ? "prisoner" : "warder";
-      setState((prevState) => {
+      setState(prevState => {
         return {
           ...prevState,
           myRole: newRole,
           turn: rcvState.turn,
           gameState: rcvState,
-          winCount: rcvState[newRole].win,
+          winCount: rcvState[newRole].win
         };
       });
     });
 
-    state.socket.on("gameWinner", (msg) => {
+    state.socket.on("gameWinner", msg => {
       msg = JSON.parse(msg);
       if (state.myRole === msg.myRole) {
         alert(msg.winMsg);
@@ -224,7 +225,7 @@ const GameArea = ({ history, location }) => {
   let blocks = null;
   if (state.gameState) {
     if (state.gameState.warder.pos && state.gameState.prisoner.pos) {
-      blocks = state.gameState.blocks.map((block) => {
+      blocks = state.gameState.blocks.map(block => {
         return <Blocks pos={block} color="black" />;
       });
 
@@ -240,11 +241,15 @@ const GameArea = ({ history, location }) => {
   }
 
   return (
-    <div>
-      <p>Your Role is : {state.myRole}</p>
-      {header}
-      <p>Win Count : {state.winCount}</p>
-      <Turn turn={state.turn} />
+    <div className="playhome">
+      <div className="content1">
+        <img src={clock} className="clock" width="95"></img>
+        <h3>Your Role is : {state.myRole}</h3>
+        {header}
+        <h3>Win Count : {state.winCount}</h3>
+        <Turn turn={state.turn} />
+      </div>
+
       <div className="game-area">{gameArea}</div>
     </div>
   );

@@ -1,14 +1,15 @@
 import React from "react";
 import "./Player.css";
 
-const player = (props) => {
+const player = props => {
+  console.log(props.pos);
   return (
     <div
-      className= {props.player}
+      className="Player"
       style={{
         left: props.pos.x,
         bottom: props.pos.y,
-        backgroundColor: props.color,
+        backgroundColor: props.color
       }}
     ></div>
   );

@@ -17,14 +17,16 @@ function Song() {
   };
 
   // play song when entered
-  useEffect(() => {
-    console.log("check1");
-    audio.play();
-  }, []);
+  // useEffect(() => {
+  //   console.log("check1");
+  //   audio.play();
+  // }, []);
 
   return (
     <div>
-      <button onClick={soundOnHandler}>{soundOn ? "Stop" : "Play"}</button>
+      <button onClick={soundOnHandler}>
+        {soundOn ? "Stop" : "Play apple pen"}
+      </button>
     </div>
   );
 }
