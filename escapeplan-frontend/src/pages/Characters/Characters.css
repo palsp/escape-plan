@@ -1,16 +1,19 @@
 .charctn {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  height: 100vh;
-  background: url("../images/blue3.jpg");
+  /* align-items: center; */
+  /* justify-content: center; */
+}
+.new-ctn {
+  background: rgb(161, 187, 202);
   background-repeat: no-repeat;
   overflow: hidden;
   background-size: cover;
+
+  height: 50.5vh;
+  border: solid white;
 }
 
 .charheader {
-  margin-top: 4em;
-  display: flex;
-  flex-direction: ;
+  margin-top: 7vh;
 }

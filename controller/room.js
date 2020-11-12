@@ -72,8 +72,8 @@ exports.joinGame = (socket, gameCode) => {
         // state.tunnel = randomPos();
         const tunnel = randomPos();
         if (
-          !isEqualPos(state.tunnel, state["warder"].pos) &&
-          !isEqualPos(state.tunnel, state["prisoner"].pos)
+          !isEqualPos(tunnel, state["warder"].pos) &&
+          !isEqualPos(tunnel, state["prisoner"].pos)
           //state.tunnel not equal to state.block
         ) {
           state.tunnel = tunnel;

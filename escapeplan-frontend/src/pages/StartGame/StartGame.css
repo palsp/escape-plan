@@ -1,32 +1,66 @@
 .startctn {
-  display: flex;
+  /* display: flex;
   flex-direction: column;
-  align-items: center;
-  height: 100vh;
+  align-items: center; */
+  height: 150vh;
   background: url("../images/blue3.jpg");
   background-repeat: no-repeat;
   overflow: hidden;
   background-size: cover;
-}
-
-.enter {
-  margin-top: 4em;
   align-items: center;
 }
 
-input {
-  width: 2000em;
-  height: 2em;
-  margin-left: 22%;
+.stylenickname {
+  width: 608px;
+  height: 96px;
+  left: 50%;
+  top: 103px;
+  margin-left: 30%;
+
+  font-family: "Noto Sans JP", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 50px;
+  line-height: 96px;
+  /* identical to box height */
+
+  text-align: center;
+
+  color: #ffffff;
+
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
+.start {
+  margin-top: 2em;
+  align-items: center;
+  justify-content: center;
+}
+.enter {
+  display: flex;
+  margin-top: 4em;
+  text-size-adjust: 20px;
+  /* justify-content: space-around; */
+  /* align-content: space-around; */
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: column;
+  /* align-content: center;
+   */
+
+  align-items: center;
+  font-size: 50px;
+}
 .buttonn {
   margin-top: 2em;
 
   display: flex;
   flex-direction: row;
-  width: calc(100%-10em);
-  height: 80vh;
+  /* width: calc(100%-10em); */
+  height: 50vh;
+  justify-content: center;
 }
 
 .buttons1 {
@@ -53,6 +87,14 @@ input {
   width: 300px;
 }
 
+.chatbox {
+  margin-right: 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 500px;
+}
+
 h3 {
   font-family: "Noto Sans JP", sans-serif;
   text-align: center;
@@ -72,5 +114,27 @@ label {
 }
 
 .inputcode {
-  width: 100vh;
+  width: 100%;
+}
+
+.enterbtn {
+  margin-top: 0em;
+  /* align-items: center; */
+}
+
+.chatbox {
+  margin-left: 2em;
+}
+
+.stylebutton {
+  color: white;
+}
+
+input {
+  font-size: 20px;
+}
+
+.sizeinput {
+  width: calc(100%-20em);
+  width: 50%;
 }

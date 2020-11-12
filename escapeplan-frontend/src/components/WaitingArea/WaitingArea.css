@@ -1,9 +1,9 @@
-.waiting {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100vh;
-  background-color: blueviolet;
+.new-waiting {
+  height: 50.5vh;
+  border: white solid;
+  background-color: rgb(223, 241, 226);
   background-repeat: no-repeat;
   background-size: cover;
+  display: flex;
+  align-items: center;
 }

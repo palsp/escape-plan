@@ -8,7 +8,7 @@ import game from "./game.png";
 function PublicRoom(props) {
   let rooms = props.rooms.map((room, index) => {
     return (
-      <Room
+      <Room 
         key={index}
         room={index + 1}
         code={room.code}

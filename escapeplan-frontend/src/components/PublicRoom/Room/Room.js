@@ -6,10 +6,9 @@ const Room = (props) => {
   return (
     <div className="room">
       <div className="room1">
-        <p className="pleft">Room No. : {props.room}</p>
+        <p className="pleft">Room No.{props.room} : <span> {props.numPlayer}/2</span></p>
         {/* <img src={game} className="game" width="95"></img> */}
-        <p className="pright">{props.numPlayer}/2</p>
-        <button onClick={() => props.clicked(props.code)} />
+        <button className="myButton2" onClick={() => props.clicked(props.code)} > <p>Join </p></button>
       </div>
     </div>
   );

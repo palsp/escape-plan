@@ -1,38 +1,43 @@
-.card {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin: 30px;
-  min-height: 30rem;
-}
-form {
-  max-width: 350px;
-  border-radius: 5px;
-  padding: 20px;
-  box-shadow: 0px 3px 24px -8px rgba(0, 0, 0, 0.75);
+.titleChat {
+  text-align: center;
+  padding-top: 1em;
+  width: 300px;
+  height: 50px;
+  background-color: rgb(36, 121, 160);
+  border: none;
 }
 
-.name-field {
-  margin-bottom: 40px;
+.bodyChat {
+  height: 400px;
+  background-color: rgb(214, 247, 252);
+  /* background-image: url("./Chatbox.png"); */
+  /* background-size: cover; */
+  background-repeat: no-repeat;
+  overflow-y: scroll;
 }
 
-button {
-  margin-top: 20px;
-  padding: 10px;
-  background: transparent;
-  border-radius: 5px;
+.inputChat {
+  display: flex;
+  flex-direction: row;
+  /* align-items: center; */
+  /* justify-content: center; */
+  width: 300px;
 }
 
-.rendor-chat {
-  max-width: 350px;
-  border-radius: 5px;
-  padding: 20px;
-  box-shadow: 0px 3px 24px -8px rgba(0, 0, 0, 0.75);
-}
-
-h3 {
-  color: #2f72da;
-}
-
-span {
+.fontChatMessage {
+  font-size: 20px;
   color: black;
+}
+
+.fontChatSender {
+  /* margin: 1em 2em 1em; */
+  font-size: 20px;
+  color: blue;
+}
+.message {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+.sendbtn {
 }

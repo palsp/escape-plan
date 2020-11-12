@@ -16,7 +16,6 @@
 }
 
 .pleft {
-  margin-top: 1.5em;
   margin-left: 2em;
   text-align: left;
   text-shadow: 1em;
@@ -33,4 +32,8 @@
   text-shadow: 1em;
   color: antiquewhite;
   font-weight: bolder;
+}
+
+.myButton2 {
+  float: right;
 }

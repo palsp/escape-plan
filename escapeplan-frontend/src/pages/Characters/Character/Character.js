@@ -4,7 +4,7 @@ const Character = (props) => (
   <div className="buttonn">
     <div className="buttons1">
       <h3>{props.name}</h3>
-
+      <img src={props.img}></img>
       <br></br>
       <button className="designbut" onClick={() => props.clicked(props.name)}>
         Select

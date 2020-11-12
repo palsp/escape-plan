@@ -33,10 +33,11 @@ h1 {
 }
 
 .headctn {
-  margin-top: 5em;
+  margin-top: 12em;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 .home {
   display: flex;
@@ -73,7 +74,7 @@ line-height: 96px;
   color: #ffffff;
 }
 
-button {
+.hp {
   background-color: rgba(165, 196, 196, 0.87);
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 }
@@ -92,4 +93,54 @@ button {
   font-size: 13px;
   font-family: "Noto Sans JP", sans-serif;
   font-weight: bolder;
+}
+
+.myButton {
+  box-shadow: 0px 10px 14px -7px #276873;
+  background: linear-gradient(to bottom, #599bb3 5%, #408c99 100%);
+  background-color: #599bb3;
+  border-radius: 8px;
+  display: inline-block;
+  cursor: pointer;
+  color: #ffffff;
+  font-family: Arial;
+  font-size: 20px;
+  font-weight: bold;
+  text-decoration: none;
+  text-shadow: 0px 1px 0px #3d768a;
+  width: 20px;
+  height: 80px;
+}
+.myButton:hover {
+  background: linear-gradient(to bottom, #408c99 5%, #599bb3 100%);
+  background-color: #408c99;
+}
+.myButton:active {
+  position: relative;
+  top: 1px;
+}
+
+.myButton3 {
+  margin-top: 1em;
+  box-shadow: 0px 1px 0px 0px #1c1b18;
+  background: linear-gradient(to bottom, #eae0c2 5%, #ccc2a6 100%);
+  background-color: #eae0c2;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #505739;
+  font-family: Arial;
+  font-size: 30px;
+  font-weight: bold;
+  padding: 0px 10px;
+  text-decoration: none;
+  text-shadow: 0px 1px 0px #ffffff;
+  width: 100px;
+}
+.myButton3:hover {
+  background: linear-gradient(to bottom, #ccc2a6 5%, #eae0c2 100%);
+  background-color: #ccc2a6;
+}
+.myButton3:active {
+  position: relative;
+  top: 1px;
 }
