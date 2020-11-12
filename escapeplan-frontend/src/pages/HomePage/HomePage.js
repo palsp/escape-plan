@@ -25,7 +25,7 @@ const HomePage = ({ history }) => {
         </div>
 
         <div className="container">
-          <button>
+          <button className="name">
             <Link to="/startgame">Start Game</Link>
           </button>
 

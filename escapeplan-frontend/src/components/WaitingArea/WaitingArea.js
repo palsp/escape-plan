@@ -9,8 +9,10 @@ const WaitingArea = (props) => {
 
   return (
     <div className="waiting">
-      <h1>Waiting for your opponents</h1>
-      {clientList}
+      <div className="opp">
+        <h0 className="wait">Waiting for your opponents</h0>
+        {clientList}
+      </div>
     </div>
   );
 };

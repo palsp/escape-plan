@@ -9,6 +9,27 @@ import Aux from "../../hoc/Aux";
 import WaitingArea from "../../components/WaitingArea/WaitingArea";
 import "./GameArea.css";
 import clock from "./clock.png";
+import Surrender from "../../components/Surrender/Surrender";
+import Characters from "../../components/Characters/Characters";
+
+// prisoner character
+import boo from "../../pages/images/boo.png";
+import minion from "../../pages/images/minion.png";
+import mojo from "../../pages/images/mojo.png";
+import prisoner from "../../pages/images/prisonerlogo.png";
+
+// //warder character
+import sully from "../../pages/images/sully.png";
+import gru from "../../pages/images/gru.png";
+import puff from "../../pages/images/puff.png";
+import warder from "../../pages/images/warderlogo.png";
+
+const gameSet = {
+  defalut: { prisonerPic: prisoner, warderPic: warder },
+  bubble: { prisonerPic: mojo, warderPic: puff },
+  gru: { prisonerPic: minion, warderPic: gru },
+  sully: { prisonerPic: boo, warderPic: sully },
+};
 
 const GameArea = ({ history, location }) => {
   const [state, setState] = useState({
@@ -21,6 +42,7 @@ const GameArea = ({ history, location }) => {
     timer: 10,
     destroyMode: false,
     clientList: [],
+    characterSet: gameSet.defalut,
   });
 
   /*  method */
@@ -125,19 +147,17 @@ const GameArea = ({ history, location }) => {
     });
   };
 
-  // const acceptInviteHandler = (gameCode) => {
-  //   state.socket.emit("acceptInvite", gameCode);
-  //   setState((prevState) => {
-  //     return { ...prevState, showInviteMessage: false };
-  //   });
-  // };
+  const surrenderHandler = () => {
+    state.socket.emit("surrender", {
+      gameCode: location.state.gameCode,
+      myRole: state.myRole,
+    });
+  };
 
-  // const rejectInviteHandler = () => {
-  //   setState((prevState) => {
-  //     return { ...prevState, showInviteMessage: false };
-  //   });
-  // };
-
+  const selectCharacterHandler = (char) => {
+    // console.log("selected Char", char);
+    state.socket.emit("selectedChar", char);
+  };
   /*  --------------------------------------------------------------------------------------- */
 
   // run every rerendering
@@ -202,6 +222,7 @@ const GameArea = ({ history, location }) => {
     });
 
     state.socket.on("updateTimer", (time) => {
+      console.log("Time", typeof time, time);
       setState((prevState) => {
         return { ...prevState, timer: time };
       });
@@ -278,18 +299,6 @@ const GameArea = ({ history, location }) => {
       });
     });
 
-    // state.socket.on("gameWinner", (msg) => {
-    //   msg = JSON.parse(msg);
-    //   if (state.myRole === msg.myRole) {
-    //     alert(msg.winMsg);
-    //   } else {
-    //     alert(msg.loseMsg);
-    //   }
-    //   state.socket.emit("endgame");
-    //   state.socket.disconnect();
-    //   history.push("/");
-    // });
-
     state.socket.on("reset", () => {
       alert("reset from server");
 
@@ -308,7 +317,17 @@ const GameArea = ({ history, location }) => {
       } else {
         alert(msg.loseMsg);
       }
-      state.socket.emit("endgame");
+      state.socket.emit("endgame", location.state.gameCode);
+      state.socket.disconnect();
+      history.push("/");
+    });
+
+    state.socket.on("surrenderResult", (message) => {
+      if (state.myRole === message.myRole) {
+        alert(message.loseMsg);
+      } else {
+        alert(message.winMsg);
+      }
       state.socket.disconnect();
       history.push("/");
     });
@@ -329,7 +348,10 @@ const GameArea = ({ history, location }) => {
   }
   let infoGame = null;
   let gameArea = (
-    <WaitingArea list={state.clientList} invite={inviteUserHandler} />
+    <Aux>
+      <WaitingArea list={state.clientList} invite={inviteUserHandler} />
+      <Characters selectChar={selectCharacterHandler} />
+    </Aux>
   );
   let blocks = null;
 
@@ -350,12 +372,23 @@ const GameArea = ({ history, location }) => {
       );
 
       gameArea = (
-        <div className="game-area">
-          <Player pos={state.gameState.warder.pos} color="green" />
-          <Player pos={state.gameState.prisoner.pos} color="red" />
-          {blocks};
-          <Tunnel pos={state.gameState.tunnel} color="blue" />
-        </div>
+        <Aux>
+          <div className="game-area">
+            <Player
+              pos={state.gameState.warder.pos}
+              color="green"
+              pic={gameSet[state.gameState.selectedChar].warderPic}
+            />
+            <Player
+              pos={state.gameState.prisoner.pos}
+              color="red"
+              pic={gameSet[state.gameState.selectedChar].prisonerPic}
+            />
+            {blocks};
+            <Tunnel pos={state.gameState.tunnel} color="blue" />
+          </div>
+          <Surrender clicked={surrenderHandler} />
+        </Aux>
       );
     }
   }
