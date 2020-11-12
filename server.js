@@ -61,6 +61,12 @@ app.get("/reset/:code", (req, res) => {
   const gameCode = req.params.code;
   console.log("reset game", gameCode);
   const gameState = GameServer.getAllState();
+  console.log("gameState", gameState);
+  const rooms = GameServer.getAllRoom();
+  delete clients[gameState[gameCode]["prisoner"].id];
+  delete clients[gameState[gameCode]["warder"].id];
+  delete rooms[gameState[gameCode]["prisoner"].id];
+  delete rooms[gameState[gameCode]["warder"].id];
   delete gameState[gameCode];
   console.log(GameServer.getAllState());
   // GameServer.setState(gameCode, {});
