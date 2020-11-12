@@ -4,7 +4,7 @@ import Client from "./Client/Client";
 const WaitingArea = (props) => {
   console.log("in waiting area", props.list);
   const clientList = props.list.map((client) => {
-    return <Client username={client.name} />;
+    return <Client username={client.name} clicked={props.invite} />;
   });
 
   return (

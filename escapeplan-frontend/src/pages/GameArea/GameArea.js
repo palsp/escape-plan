@@ -117,6 +117,27 @@ const GameArea = ({ history, location }) => {
     }
   };
 
+  const inviteUserHandler = (name) => {
+    console.log("inviteUserFromClient", location.state);
+    state.socket.emit("inviteUser", {
+      name: name,
+      gameCode: location.state.gameCode,
+    });
+  };
+
+  // const acceptInviteHandler = (gameCode) => {
+  //   state.socket.emit("acceptInvite", gameCode);
+  //   setState((prevState) => {
+  //     return { ...prevState, showInviteMessage: false };
+  //   });
+  // };
+
+  // const rejectInviteHandler = () => {
+  //   setState((prevState) => {
+  //     return { ...prevState, showInviteMessage: false };
+  //   });
+  // };
+
   /*  --------------------------------------------------------------------------------------- */
 
   // run every rerendering
@@ -148,11 +169,22 @@ const GameArea = ({ history, location }) => {
         return { ...prevState, clientList: clientList };
       });
     });
+
+    state.socket.on("updateClientList", (user) => {
+      let newList = [...state.clientList];
+      newList = newList.filter((client) => {
+        return client.name !== user.name;
+      });
+      console.log("newList", newList);
+      setState((prevState) => {
+        return { ...prevState, clientList: newList };
+      });
+    });
   }, [state.clientList]);
   // run only once
   useEffect(() => {
+    state.socket.emit("requestUserList");
     console.log("use effect 1st", location.state);
-    // state.socket.emit("greeting", location.state.username);
 
     state.socket.on("gameStart", (serverState) => {
       console.log("gameStart");
@@ -246,17 +278,17 @@ const GameArea = ({ history, location }) => {
       });
     });
 
-    state.socket.on("gameWinner", (msg) => {
-      msg = JSON.parse(msg);
-      if (state.myRole === msg.myRole) {
-        alert(msg.winMsg);
-      } else {
-        alert(msg.loseMsg);
-      }
-      state.socket.emit("endgame");
-      state.socket.disconnect();
-      history.push("/");
-    });
+    // state.socket.on("gameWinner", (msg) => {
+    //   msg = JSON.parse(msg);
+    //   if (state.myRole === msg.myRole) {
+    //     alert(msg.winMsg);
+    //   } else {
+    //     alert(msg.loseMsg);
+    //   }
+    //   state.socket.emit("endgame");
+    //   state.socket.disconnect();
+    //   history.push("/");
+    // });
 
     state.socket.on("reset", () => {
       alert("reset from server");
@@ -268,6 +300,19 @@ const GameArea = ({ history, location }) => {
     console.log(state);
   }, []);
 
+  useEffect(() => {
+    state.socket.on("gameWinner", (msg) => {
+      msg = JSON.parse(msg);
+      if (state.myRole === msg.myRole) {
+        alert(msg.winMsg);
+      } else {
+        alert(msg.loseMsg);
+      }
+      state.socket.emit("endgame");
+      state.socket.disconnect();
+      history.push("/");
+    });
+  }, [state.myRole]);
   /* rendering part */
   let header = null;
   if (location.state.gameCode) {
@@ -283,8 +328,11 @@ const GameArea = ({ history, location }) => {
     );
   }
   let infoGame = null;
-  let gameArea = <WaitingArea list={state.clientList} />;
+  let gameArea = (
+    <WaitingArea list={state.clientList} invite={inviteUserHandler} />
+  );
   let blocks = null;
+
   if (state.gameState) {
     if (state.gameState.warder.pos && state.gameState.prisoner.pos) {
       blocks = state.gameState.blocks.map((block) => {
@@ -314,6 +362,7 @@ const GameArea = ({ history, location }) => {
 
   return (
     <div className="playhome">
+      {/* {inviteMessage} */}
       <div className="content1">
         <img src={clock} className="clock" width="95"></img>
         <h3>Your Role is : {state.myRole}</h3>

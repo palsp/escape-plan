@@ -68,13 +68,15 @@ app.get("/reset/:code", (req, res) => {
 io.on("connection", (socket) => {
   // tell other clients that you joined
   socket.on("greeting", (username) => {
-    // const clients = GameServer.getAllClients();
-    console.log(clients);
+    console.log("greeting");
     clients[socket.id] = username;
     socket.broadcast.emit("userJoin", { name: username });
-    // console.log(socket.id, Object.keys(clients));
+  });
+
+  socket.on("requestUserList", () => {
+    const rooms = GameServer.getAllRoom();
     let clientList = Object.keys(clients).filter((id) => {
-      return id !== socket.id;
+      return id !== socket.id && !rooms[id];
     });
 
     // console.log("socket", socket.id, clients[socket.id]);
@@ -84,20 +86,28 @@ io.on("connection", (socket) => {
     });
 
     // console.log("list", clientList);
-    console.log("with name", clientList);
+    // console.log("with name", clientList);
     socket.emit("userList", JSON.stringify({ clientList: clientList }));
   });
 
   // invited other users
   socket.on("inviteUser", ({ name, gameCode }) => {
     // const clients = GameServer.getAllClients();
+    // console.log("inviteUser", gameCode);
     const userIndex = Object.keys(clients).findIndex((id) => {
       return clients[id] === name;
     });
+
+    // const fromUser = Object.keys(clients)[socket.id];
+    const fromUser = clients[socket.id];
     const id = Object.keys(clients)[userIndex];
-    socket.to(id).emit("invite", gameCode);
+    socket.to(id).emit("invite", { fromUser: fromUser, gameCode: gameCode });
   });
 
+  socket.on("acceptInvite", (gameCode) => {
+    console.log("accept invite");
+    roomController.joinGame(socket, gameCode);
+  });
   socket.on("getAllRoom", () => {});
   console.log("User is connected", onlineUsers);
   onlineUsers++;
@@ -112,7 +122,13 @@ io.on("connection", (socket) => {
     io.emit("chatMessage", { name, message });
   });
 
-  socket.on("createNewGame", roomController.createGame.bind(this, socket));
+  // socket.on("createNewGame", roomController.createGame.bind(this, socket));
+
+  socket.on("createNewGame", () => {
+    roomController.createGame(socket);
+
+    socket.broadcast.emit("updateClientList", { name: clients[socket.id] });
+  });
   socket.on("joinRoom", roomController.joinGame.bind(this, socket));
   socket.on("requestAllRoom", roomController.getAllRoom.bind(this, socket));
 

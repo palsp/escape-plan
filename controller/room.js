@@ -64,6 +64,7 @@ exports.joinGame = (socket, gameCode) => {
           break;
         }
       }
+      console.log("joinRoom", numClients);
       state[role].win = 0;
       state.remainingRole = "";
       // random tunnel pos

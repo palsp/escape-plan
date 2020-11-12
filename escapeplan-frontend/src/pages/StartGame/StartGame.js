@@ -14,10 +14,15 @@ function StartGame({ history }) {
   const [socket, setSocket] = useState(Socket.getClient());
   const [publicRoom, setPublicRoom] = useState([]);
   const [showAllRoom, setShowAllRoom] = useState(false);
+  const [showInviteMessage, setShowInviteMessage] = useState(false);
+  const [inviteToGameCode, setInviteToGameCode] = useState(null);
+  const [fromUser, setFromUser] = useState(null);
+  // const [clientList, setClientList] = useState([]);
+
   const newGameHandler = () => {
     socket.emit("createNewGame");
     console.log("name", username);
-    socket.emit("greeting", username);
+    // socket.emit("greeting", username);
   };
 
   const inputNameHandler = (event) => {
@@ -42,8 +47,19 @@ function StartGame({ history }) {
   };
 
   const submitHandler = () => {
-    // console.log(username);
-    // socket.emit("greeting", username);
+    alert("Hello   " + username);
+    socket.emit("greeting", username);
+  };
+
+  const acceptInviteHandler = () => {
+    console.log("invite to gameCode", inviteToGameCode);
+    socket.emit("acceptInvite", inviteToGameCode);
+
+    setShowInviteMessage(false);
+  };
+
+  const rejectInviteHandler = () => {
+    setShowInviteMessage(false);
   };
 
   useEffect(() => {
@@ -90,7 +106,13 @@ function StartGame({ history }) {
   }, [socket]);
 
   useEffect(() => {
-    socket.on("inviteFromPlayer");
+    socket.on("invite", ({ fromUser, gameCode }) => {
+      console.log("receive from", fromUser, "to", gameCode);
+      console.log("receive invite");
+      setFromUser(fromUser);
+      setInviteToGameCode(gameCode);
+      setShowInviteMessage(true);
+    });
   }, []);
 
   let invite = null;
@@ -101,9 +123,26 @@ function StartGame({ history }) {
       <PublicRoom rooms={publicRoom} join={joinFromPublicRoomHandler} />
     );
   }
+
+  let inviteMessage = null;
+
+  if (showInviteMessage) {
+    inviteMessage = (
+      <label>
+        <p>Receive invite from {fromUser}</p>
+        <button onClick={() => acceptInviteHandler(inviteToGameCode)}>
+          {" "}
+          Accept
+        </button>
+        <button onClick={() => rejectInviteHandler()}>Reject</button>
+      </label>
+    );
+  }
+
   return (
     <div className="startctn">
       {display}
+      {inviteMessage}
 
       <div className="enter">
         <h1 className="welcome">Enter Your Name</h1>

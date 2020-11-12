@@ -5,8 +5,7 @@ const Client = (props) => {
     <div>
       <label>
         <h1>{props.username}</h1>
-        {/* <button onClick={props.clicked}>Invite</button> */}
-        <button>Invite</button>
+        <button onClick={() => props.clicked(props.username)}>Invite</button>
       </label>
     </div>
   );
