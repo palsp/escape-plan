@@ -12,6 +12,7 @@ const GameServer = require("./models/server");
 const { gameReset, destroyblock } = require("./util/game");
 const bodyParser = require("body-parser");
 
+let timer = 10;
 let admins = [{ username: "pal", password: "12345" }];
 let onlineUsers = 0;
 let intervalId;
@@ -66,7 +67,6 @@ app.get("/reset/:code", (req, res) => {
 
 io.on("connection", (socket) => {
   // tell other clients that you joined
-  console.log("user connected");
   socket.on("greeting", (username) => {
     console.log("greeting");
     clients[socket.id] = username;
@@ -108,23 +108,13 @@ io.on("connection", (socket) => {
     console.log("accept invite");
     roomController.joinGame(socket, gameCode);
   });
-
-  socket.on("selectedChar", (char) => {
-    const gameCode = GameServer.getGameRoom(socket.id);
-    const gameState = GameServer.getState(gameCode);
-    // console.log("select char", gameState);
-    gameState.selectedChar = char;
-    // console.log("selected Char", gameCode, gameState);
-  });
-
   socket.on("getAllRoom", () => {});
-  // console.log("User is connected", onlineUsers);
+  console.log("User is connected", onlineUsers);
   onlineUsers++;
   io.emit("onlineUsers", onlineUsers);
 
   socket.on("disconnect", () => {
     onlineUsers--;
-    console.log("socket disconnect");
     io.emit("onlineUsers", onlineUsers);
   });
 
@@ -134,14 +124,19 @@ io.on("connection", (socket) => {
 
   // socket.on("createNewGame", roomController.createGame.bind(this, socket));
 
+  socket.on("selectedChar", (char) => {
+    const gameCode = GameServer.getGameRoom(socket.id);
+    const gameState = GameServer.getState(gameCode);
+
+    gameState.selectedChar = char;
+  });
+
   socket.on("createNewGame", () => {
     roomController.createGame(socket);
 
     socket.broadcast.emit("updateClientList", { name: clients[socket.id] });
   });
-
   socket.on("joinRoom", roomController.joinGame.bind(this, socket));
-
   socket.on("requestAllRoom", roomController.getAllRoom.bind(this, socket));
 
   socket.on("destroyblock", (data) => {
@@ -161,8 +156,7 @@ io.on("connection", (socket) => {
       gameState = updatedState;
     }
     gameState.turn = !gameState.turn;
-    // timer = 10;
-    gameState.timer = 10;
+    timer = 10;
     return io.in(gameCode).emit("destroyBlock", JSON.stringify(gameState));
   });
 
@@ -175,8 +169,8 @@ io.on("connection", (socket) => {
       // continue game
       console.log("continue game in game loop");
       gameState.turn = !gameState.turn;
-      // timer = 10;
-      gameState.timer = 10;
+      // resetTimer();
+      timer = 10;
       return io.in(gameCode).emit("gameContinue", JSON.stringify(gameState));
     } else if (winner === 1) {
       //  prisoner win this round
@@ -193,8 +187,8 @@ io.on("connection", (socket) => {
         );
       }
       gameState = gameReset(gameState, "prisoner");
-      // timer  = 10
-      gameState.timer = 10;
+      // resetTimer();
+      timer = 10;
       return io.in(gameCode).emit("prisonerWin", JSON.stringify(gameState));
     } else if (winner === 2) {
       // warder win this round
@@ -212,9 +206,7 @@ io.on("connection", (socket) => {
         );
       }
       gameState = gameReset(gameState, "warder");
-      // timer = 10;
-      gameState.timer = 10;
-
+      timer = 10;
       return io.in(gameCode).emit("warderWin", JSON.stringify(gameState));
     }
   });
@@ -223,37 +215,22 @@ io.on("connection", (socket) => {
     const gameCode = GameServer.getGameRoom(socket.id);
     const gameState = GameServer.getState(gameCode);
     io.in(gameCode).emit("gameStart", JSON.stringify(gameState));
-    console.log(socket.id, "user emit ready");
+    console.log("user emit ready");
 
     intervalId = setInterval(() => {
-      gameState.timer -= 1;
-      io.in(gameCode).emit("updateTimer", gameState.timer);
-      if (gameState.timer === 0) {
-        // timer = 10;
-        gameState.timer = 10;
+      timer -= 1;
+      io.in(gameCode).emit("updateTimer", timer);
+      if (timer === 0) {
+        timer = 10;
         gameState.turn = !gameState.turn;
         io.in(gameCode).emit("switchTurn", gameState.turn);
       }
     }, 1000);
   });
 
-  socket.on("endgame", (gameCode) => {
+  socket.on("endgame", () => {
     clearInterval(intervalId);
-    //timer = 10;
-
-    /* clean up */
-    delete GameServer.getAllState()[gameCode];
-    delete GameServer.getAllRoom()[socket.id];
-    delete clients[socket.id];
-  });
-
-  socket.on("surrender", ({ gameCode, myRole }) => {
-    gameState = {};
-    io.in(gameCode).emit("surrenderResult", {
-      myRole: myRole,
-      winMsg: "Congratulation!!!",
-      loseMsg: "You lose!!!!!",
-    });
+    timer = 10;
   });
 
   socket.on("chat message", (recipientUserName, messageContent) => {
