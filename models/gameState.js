@@ -8,6 +8,7 @@ class GameState {
   turn = "";
   remainingRole = "";
   selectedChar = "";
+  timer = "";
 
   static createGameState(id) {
     const rv = new GameState();
@@ -19,6 +20,7 @@ class GameState {
     rv.remainingRole = role === "warder" ? "prisoner" : "warder";
     rv.turn = true;
     rv.selectedChar = "default";
+    rv.timer = 10;
     return rv;
   }
 }
