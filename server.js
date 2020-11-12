@@ -208,10 +208,10 @@ io.on("connection", (socket) => {
       // warder win this round
       gameState["warder"].win += 1;
       if (gameState["warder"].win === 3) {
-        socket
+        io.sockets
           .to(gameState["prisoner"].id)
           .emit("gameWinner", "You lose !!!!!!!!!");
-        socket
+        io.sockets
           .to(gameState["warder"].id)
           .emit("gameWinner", "you win !!!!!!!!!");
         // gameState = {};
@@ -246,11 +246,15 @@ io.on("connection", (socket) => {
 
   socket.on("endgame", (gameCode) => {
     clearInterval(intervalId);
+
     //timer = 10;
 
     /* clean up */
-    delete GameServer.getAllState()[gameCode];
-    delete GameServer.getAllRoom()[socket.id];
+    console.log("gameend", gameCode);
+    const state = GameServer.getAllState();
+    const rooms = GameServer.getAllRoom();
+    delete state[gameCode];
+    delete rooms[socket.id];
     delete clients[socket.id];
   });
 
@@ -262,6 +266,12 @@ io.on("connection", (socket) => {
       myRole === "prisoner" ? gameState["prisoner"].id : gameState["warder"].id;
     const winner =
       myRole === "prisoner" ? gameState["warder"].id : gameState["prisoner"].id;
+
+    delete GameServer.getAllRoom()[winner];
+    delete GameServer.getAllRoom()[loser];
+    delete GameServer.getAllState()[gameCode];
+    delete clients[winner];
+    delete clients[loser];
 
     io.sockets.to(winner).emit("surrenderResult", "you win!!!!!!!!");
     io.sockets.to(loser).emit("surrenderResult", "you lose!!!!!!!!");

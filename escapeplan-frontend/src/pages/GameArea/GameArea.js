@@ -305,8 +305,9 @@ const GameArea = ({ history, location }) => {
     });
 
     state.socket.on("gameWinner", (msg) => {
+      console.log("gameWinner");
       alert(msg);
-      state.socket.emit("endgame");
+      state.socket.emit("endgame", location.state.gameCode);
       state.socket.disconnect();
       history.push("/");
     });
