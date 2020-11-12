@@ -6,8 +6,30 @@ import Blocks from "../../components/Blocks/Blocks";
 import Player from "../../components/Player/Player";
 import Turn from "../../components/Turn/Turn";
 import Aux from "../../hoc/Aux";
+import WaitingArea from "../../components/WaitingArea/WaitingArea";
 import "./GameArea.css";
 import clock from "./clock.png";
+import Surrender from "../../components/Surrender/Surrender";
+import Characters from "../../components/Characters/Characters";
+
+// prisoner character
+import boo from "../../pages/images/boo.png";
+import minion from "../../pages/images/minion.png";
+import mojo from "../../pages/images/mojo.png";
+import prisoner from "../../pages/images/prisonerlogo.png";
+
+// //warder character
+import sully from "../../pages/images/sully.png";
+import gru from "../../pages/images/gru.png";
+import puff from "../../pages/images/puff.png";
+import warder from "../../pages/images/warderlogo.png";
+
+const gameSet = {
+  defalut: { prisonerPic: prisoner, warderPic: warder },
+  bubble: { prisonerPic: mojo, warderPic: puff },
+  gru: { prisonerPic: minion, warderPic: gru },
+  sully: { prisonerPic: boo, warderPic: sully },
+};
 
 const GameArea = ({ history, location }) => {
   const [state, setState] = useState({
@@ -15,15 +37,26 @@ const GameArea = ({ history, location }) => {
     gameState: null,
     winCount: 0,
     myRole: location.state.myRole,
-    gameState: false,
-    turn: false,
+    gameStart: false,
+    turn: true,
     timer: 10,
+    destroyMode: false,
+    clientList: [],
+    characterSet: gameSet.defalut,
   });
 
   /*  method */
 
   const moveValidation = (keypress, pos, blocks) => {
+    if (keypress === "k") {
+      setState((prevState) => {
+        return { ...prevState, destroyMode: true };
+      });
+      return;
+    }
+
     let move;
+
     switch (keypress) {
       // left
       case "a":
@@ -52,10 +85,25 @@ const GameArea = ({ history, location }) => {
     }
     // block collision
     for (let b of blocks) {
-      if (b.x === next.x && b.y === next.y) {
-        check = false;
+      if (state.destroyMode) {
+        if (b.x === next.x && b.y === next.y) {
+          return true;
+        }
+      } else {
+        if (b.x === next.x && b.y === next.y) {
+          check = false;
+        }
       }
     }
+
+    if (
+      state.myRole === "warder" &&
+      next.x === state.gameState.tunnel.x &&
+      next.y === state.gameState.tunnel.y
+    ) {
+      check = false;
+    }
+
     return check;
   };
 
@@ -77,12 +125,39 @@ const GameArea = ({ history, location }) => {
         myRole: state.myRole,
         gameCode: location.state.gameCode,
       };
-      state.socket.emit("play", JSON.stringify(data));
+
+      if (state.destroyMode) {
+        state.socket.emit("destroyblock", JSON.stringify(data));
+        setState((prevState) => {
+          return { ...prevState, destroyMode: false };
+        });
+      } else {
+        state.socket.emit("play", JSON.stringify(data));
+      }
       // console.log("data", data);
       return window.removeEventListener("keypress", onKeyPressHandler);
     }
   };
 
+  const inviteUserHandler = (name) => {
+    console.log("inviteUserFromClient", location.state);
+    state.socket.emit("inviteUser", {
+      name: name,
+      gameCode: location.state.gameCode,
+    });
+  };
+
+  const surrenderHandler = () => {
+    state.socket.emit("surrender", {
+      gameCode: location.state.gameCode,
+      myRole: state.myRole,
+    });
+  };
+
+  const selectCharacterHandler = (char) => {
+    // console.log("selected Char", char);
+    state.socket.emit("selectedChar", char);
+  };
   /*  --------------------------------------------------------------------------------------- */
 
   // run every rerendering
@@ -95,21 +170,51 @@ const GameArea = ({ history, location }) => {
     };
   });
 
+  useEffect(() => {
+    state.socket.on("userJoin", (user) => {
+      const clientList = [...state.clientList];
+      clientList.push(user);
+      console.log("userJoin", clientList);
+      setState((prevState) => {
+        return { ...prevState, clientList: clientList };
+      });
+    });
+
+    state.socket.on("userList", (list) => {
+      console.log("userList");
+      // console.log("user join", list);
+      const clientList = JSON.parse(list).clientList;
+      // console.log("here", clientList);
+      setState((prevState) => {
+        return { ...prevState, clientList: clientList };
+      });
+    });
+
+    state.socket.on("updateClientList", (user) => {
+      let newList = [...state.clientList];
+      newList = newList.filter((client) => {
+        return client.name !== user.name;
+      });
+      console.log("newList", newList);
+      setState((prevState) => {
+        return { ...prevState, clientList: newList };
+      });
+    });
+  }, [state.clientList]);
   // run only once
   useEffect(() => {
+    state.socket.emit("requestUserList");
+    console.log("use effect 1st", location.state);
+
     state.socket.on("gameStart", (serverState) => {
       console.log("gameStart");
       const rcvState = JSON.parse(serverState);
-      // setGameState(state);
-      // setTurn(state.turn);
-      // setGameStart(true);
-      // setWinCount(state[myRole].win);
 
       setState((prevState) => {
         return {
           ...prevState,
           gameState: rcvState,
-          turn: state.turn,
+          turn: rcvState.turn,
           gameStart: true,
           winCount: rcvState[location.state.myRole].win,
         };
@@ -117,6 +222,7 @@ const GameArea = ({ history, location }) => {
     });
 
     state.socket.on("updateTimer", (time) => {
+      console.log("Time", typeof time, time);
       setState((prevState) => {
         return { ...prevState, timer: time };
       });
@@ -132,9 +238,24 @@ const GameArea = ({ history, location }) => {
     });
 
     state.socket.on("gameContinue", (serverState) => {
+      console.log("gameState before send to server", state.gameState);
+
       const rcvState = JSON.parse(serverState);
+      console.log("game continue", rcvState);
       // setGameState(state);
       // setTurn(turn);
+
+      setState((prevState) => {
+        return { ...prevState, gameState: rcvState, turn: rcvState.turn };
+      });
+    });
+
+    state.socket.on("destroyBlock", (serverState) => {
+      const rcvState = JSON.parse(serverState);
+      console.log("game continue", rcvState);
+      // setGameState(state);
+      // setTurn(turn);
+
       setState((prevState) => {
         return { ...prevState, gameState: rcvState, turn: rcvState.turn };
       });
@@ -148,8 +269,7 @@ const GameArea = ({ history, location }) => {
 
       const newRole =
         rcvState["prisoner"].id === state.socket.id ? "prisoner" : "warder";
-      // setMyRole(newRole);
-      // setWinCount(state[newRole].win);
+
       setState((prevState) => {
         return {
           ...prevState,
@@ -165,15 +285,7 @@ const GameArea = ({ history, location }) => {
       const rcvState = JSON.parse(serverState);
 
       alert("warder win");
-      // console.log("prisoner id", rcvState["prisoner"].id);
-      // console.log("user id", state.socket.id);
-      // setGameState(state);
-      // setTurn(state.turn);
 
-      // const newRole =
-      //   state["prisoner"].id === socket.id ? "prisoner" : "warder";
-      // setMyRole(newRole);
-      // setWinCount(state[newRole].win);
       const newRole =
         rcvState["prisoner"].id === state.socket.id ? "prisoner" : "warder";
       setState((prevState) => {
@@ -187,6 +299,17 @@ const GameArea = ({ history, location }) => {
       });
     });
 
+    state.socket.on("reset", () => {
+      alert("reset from server");
+
+      state.socket.disconnect();
+      history.push("/");
+    });
+
+    console.log(state);
+  }, []);
+
+  useEffect(() => {
     state.socket.on("gameWinner", (msg) => {
       msg = JSON.parse(msg);
       if (state.myRole === msg.myRole) {
@@ -194,22 +317,25 @@ const GameArea = ({ history, location }) => {
       } else {
         alert(msg.loseMsg);
       }
+      state.socket.emit("endgame", location.state.gameCode);
       state.socket.disconnect();
       history.push("/");
     });
 
-    state.socket.on("reset", () => {
-      alert("reset from server");
-
+    state.socket.on("surrenderResult", (message) => {
+      if (state.myRole === message.myRole) {
+        alert(message.loseMsg);
+      } else {
+        alert(message.winMsg);
+      }
       state.socket.disconnect();
       history.push("/");
     });
-  }, []);
-
+  }, [state.myRole]);
   /* rendering part */
   let header = null;
   if (location.state.gameCode) {
-    header = <p> Your gamCode is : {location.state.gameCode}</p>;
+    header = <p> Your gameCode is : {location.state.gameCode}</p>;
   }
 
   if (state.gameStart) {
@@ -220,35 +346,56 @@ const GameArea = ({ history, location }) => {
       </Aux>
     );
   }
-
-  let gameArea = null;
+  let infoGame = null;
+  let gameArea = (
+    <Aux>
+      <WaitingArea list={state.clientList} invite={inviteUserHandler} />
+      <Characters selectChar={selectCharacterHandler} />
+    </Aux>
+  );
   let blocks = null;
+
   if (state.gameState) {
     if (state.gameState.warder.pos && state.gameState.prisoner.pos) {
       blocks = state.gameState.blocks.map((block) => {
         return <Blocks pos={block} color="black" />;
       });
 
+      infoGame = (
+        <div className="content1">
+          <img src={clock} className="clock" width="95"></img>
+          <h3>Your Role is : {state.myRole}</h3>
+          {header}
+          <h3>Win Count : {state.winCount}</h3>
+          <Turn turn={state.turn} />
+        </div>
+      );
+
       gameArea = (
         <Aux>
-          <Player pos={state.gameState.warder.pos} color="green" />
-          <Player pos={state.gameState.prisoner.pos} color="red" />
-          {blocks};
-          <Tunnel pos={state.gameState.tunnel} color="blue" />
+          <div className="game-area">
+            <Player
+              pos={state.gameState.warder.pos}
+              color="green"
+              pic={gameSet[state.gameState.selectedChar].warderPic}
+            />
+            <Player
+              pos={state.gameState.prisoner.pos}
+              color="red"
+              pic={gameSet[state.gameState.selectedChar].prisonerPic}
+            />
+            {blocks};
+            <Tunnel pos={state.gameState.tunnel} color="blue" />
+          </div>
+          <Surrender clicked={surrenderHandler} />
         </Aux>
       );
     }
   }
 
   return (
-    // <div>
-    //   <p>Your Role is : {state.myRole}</p>
-    //   {header}
-    //   <p>Win Count : {state.winCount}</p>
-    //   <Turn turn={state.turn} />
-    //   <div className="game-area">{gameArea}</div>
-    // </div>
     <div className="playhome">
+      {/* {inviteMessage} */}
       <div className="content1">
         <img src={clock} className="clock" width="95"></img>
         <h3>Your Role is : {state.myRole}</h3>
@@ -256,8 +403,8 @@ const GameArea = ({ history, location }) => {
         <h3>Win Count : {state.winCount}</h3>
         <Turn turn={state.turn} />
       </div>
-
-      <div className="game-area">{gameArea}</div>
+      {gameArea}
+      {/* <div className="game-area">{gameArea}</div> */}
     </div>
   );
 };

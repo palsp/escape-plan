@@ -64,6 +64,7 @@ exports.joinGame = (socket, gameCode) => {
           break;
         }
       }
+      console.log("joinRoom", numClients);
       state[role].win = 0;
       state.remainingRole = "";
       // random tunnel pos
@@ -121,4 +122,39 @@ exports.joinGame = (socket, gameCode) => {
     });
   }
   return socket.emit("err", JSON.stringify({ message: errMessage }));
+};
+
+// rooms = [{
+// id : gameCode
+// }]
+//rooms[socket.id] = gameCode
+exports.getAllRoom = (socket) => {
+  const io = require("../socket").getIO();
+  let rooms = { ...GameServer.getAllRoom() };
+  const clients = Object.keys(rooms);
+
+  rooms = [];
+
+  for (let client of clients) {
+    const room = GameServer.getGameRoom(client);
+    if (!rooms.includes(room)) {
+      rooms.push(room);
+    }
+  }
+
+  rooms = rooms.map((gameCode) => {
+    const room = io.sockets.adapter.rooms[gameCode];
+    let allUsers;
+    if (room) {
+      allUsers = room.sockets;
+    }
+    let numClients = 0;
+    if (allUsers) {
+      numClients = Object.keys(allUsers).length;
+    }
+    return { code: gameCode, numClients: numClients };
+  });
+
+  console.log("rooms", rooms);
+  socket.emit("getAllRoom", JSON.stringify({ rooms: rooms }));
 };

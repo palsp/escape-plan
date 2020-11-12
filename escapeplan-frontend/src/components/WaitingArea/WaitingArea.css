@@ -1,0 +1,13 @@
+.waiting {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  background-color: blueviolet;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.wait {
+  color: white;
+}

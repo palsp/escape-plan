@@ -1,6 +1,7 @@
 const GameServer = require("../models/server");
 const Validation = require("../util/pos");
 const Socket = require("../socket");
+const socket = require("../socket");
 
 const swapRole = (gameState) => {
   const helper = gameState["prisoner"];
@@ -12,7 +13,7 @@ const swapRole = (gameState) => {
 exports.gameReset = (gameState, winner) => {
   // const gameReset = (gameState, winner) => {
   // role of the next round starter is  the same as role of the winner of this round
-  gameState.turn = winner === "warder" ? true : false;
+  gameState.turn = winner === "warder" ? false : true;
   console.log("before swap", gameState);
   gameState = swapRole(gameState);
   console.log("after swap", gameState);
@@ -143,46 +144,42 @@ exports.gameLoop = (gameCode, id, move) => {
   );
 
   return winner;
-  // if (!winner) {
-  //   // continue game
-  //   console.log("continue game in game loop");
-  //   gameState.turn = !gameState.turn;
-  //   resetTimer();
-  //   return io.in(gameCode).emit("gameContinue", JSON.stringify(gameState));
-  // } else if (winner === 1) {
-  //   //  prisoner win this round
-  //   gameState["prisoner"].win += 1;
-  //   if (gameState["prisoner"].win === 3) {
-  //     gameState = {};
-  //     return io.in(gameCode).emit(
-  //       "gameWinner",
-  //       JSON.stringify({
-  //         myRole: "prisoner",
-  //         winMsg: "Congratulation!!!",
-  //         loseMsg: "You lose!!!!!",
-  //       })
-  //     );
-  //   }
-  //   gameState = gameReset(gameState, "prisoner");
-  //   resetTimer();
-  //   return io.in(gameCode).emit("prisonerWin", JSON.stringify(gameState));
-  // } else if (winner === 2) {
-  //   // warder win this round
-  //   gameState["warder"].win += 1;
-  //   if (gameState["warder"].win === 3) {
-  //     gameState = {};
-  //     // clear game Room
-  //     return io.in(gameCode).emit(
-  //       "gameWinner",
-  //       JSON.stringify({
-  //         myRole: "warder",
-  //         winMsg: "Congratulation!!!",
-  //         loseMsg: "You lose!!!!!",
-  //       })
-  //     );
-  //   }
-  //   gameState = gameReset(gameState, "warder");
-  //   resetTimer();
-  //   return io.in(gameCode).emit("warderWin", JSON.stringify(gameState));
-  // }
+};
+
+exports.destroyblock = (gameCode, id, move) => {
+  let gameState = GameServer.getState(gameCode);
+  let player =
+    id === gameState["prisoner"].id
+      ? gameState["prisoner"]
+      : gameState["warder"];
+  let vel;
+  switch (move) {
+    case "a": // left
+      vel = { x: -100, y: 0 };
+      break;
+    case "w": // up
+      vel = { x: 0, y: 100 };
+      break;
+    case "d": // right
+      vel = { x: 100, y: 0 };
+      break;
+    case "s": // down
+      vel = { x: 0, y: -100 };
+      break;
+    default:
+      vel = { x: 0, y: 0 };
+  }
+
+  const newPos = { ...player.pos };
+  newPos.x += vel.x;
+  newPos.y += vel.y;
+
+  if (Validation.isInArrayOf(newPos, gameState.blocks)) {
+    gameState.blocks = gameState.blocks.filter((block) => {
+      return !Validation.isEqualPos(block, newPos);
+    });
+    return gameState;
+  }
+
+  return null;
 };

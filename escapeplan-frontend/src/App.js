@@ -5,8 +5,10 @@ import HomePage from "./pages/HomePage/HomePage";
 import HowToPlay from "./pages/HowToPlay/HowToPlay";
 import StartGame from "./pages/StartGame/StartGame";
 import GameArea from "./pages/GameArea/GameArea";
+import Invite from "./components/Invite/Invite";
+import Character from "./components/Characters/Characters";
 
-import CharWarder from "./pages/CharWarder/CharWarder";
+import WaitingArea from "./components/WaitingArea/WaitingArea";
 
 function App() {
   return (
@@ -17,8 +19,11 @@ function App() {
           <Route path="/startgame" exact component={StartGame}></Route>
           <Route path="/gamearea" exact component={GameArea}></Route>
           {/* <Route path="/song" exact component={Song}></Route> */}
-
-          <Route path="/charwarder" exact component={CharWarder}></Route>
+          <Route path="/wait" exact component={WaitingArea} />
+          {/* <Route path="/charwarder" exact component={CharWarder}></Route> */}
+          <Route path="/invite" exact component={Invite}></Route>
+          {/* <Route path="/timer" exact component={Timer2}></Route> */}
+          <Route path="/char" exact component={Character} />
 
           <Route path="/howtoplay" exact component={HowToPlay}></Route>
         </Switch>
