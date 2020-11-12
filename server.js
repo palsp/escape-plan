@@ -182,15 +182,22 @@ io.on("connection", (socket) => {
       //  prisoner win this round
       gameState["prisoner"].win += 1;
       if (gameState["prisoner"].win === 3) {
+        // return io.in(gameCode).emit(
+        //   "gameWinner",
+        //   JSON.stringify({
+        //     myRole: "prisoner",
+        //     winMsg: "Congratulation!!!",
+        //     loseMsg: "You lose!!!!!",
+        //   })
+        // );
+        io.sockets
+          .to(gameState["prisoner"].id)
+          .emit("gameWinner", "You win !!!!!!!!!");
+        io.sockets
+          .to(gameState["warder"].id)
+          .emit("gameWinner", "you lose !!!!!!!!!");
         gameState = {};
-        return io.in(gameCode).emit(
-          "gameWinner",
-          JSON.stringify({
-            myRole: "prisoner",
-            winMsg: "Congratulation!!!",
-            loseMsg: "You lose!!!!!",
-          })
-        );
+        return;
       }
       gameState = gameReset(gameState, "prisoner");
       // timer  = 10
@@ -200,16 +207,23 @@ io.on("connection", (socket) => {
       // warder win this round
       gameState["warder"].win += 1;
       if (gameState["warder"].win === 3) {
-        gameState = {};
         // clear game Room
-        return io.in(gameCode).emit(
-          "gameWinner",
-          JSON.stringify({
-            myRole: "warder",
-            winMsg: "Congratulation!!!",
-            loseMsg: "You lose!!!!!",
-          })
-        );
+        // return io.in(gameCode).emit(
+        //   "gameWinner",
+        //   JSON.stringify({
+        //     myRole: "warder",
+        //     winMsg: "Congratulation!!!",
+        //     loseMsg: "You lose!!!!!",
+        //   })
+        // );
+        socket
+          .to(gameState["prisoner"].id)
+          .emit("gameWinner", "You lose !!!!!!!!!");
+        socket
+          .to(gameState["warder"].id)
+          .emit("gameWinner", "you win !!!!!!!!!");
+        gameState = {};
+        return;
       }
       gameState = gameReset(gameState, "warder");
       // timer = 10;
@@ -248,12 +262,16 @@ io.on("connection", (socket) => {
   });
 
   socket.on("surrender", ({ gameCode, myRole }) => {
-    gameState = {};
-    io.in(gameCode).emit("surrenderResult", {
-      myRole: myRole,
-      winMsg: "Congratulation!!!",
-      loseMsg: "You lose!!!!!",
-    });
+    const gameState = GameServer.getState(gameCode);
+    console.log(gameState, gameCode);
+
+    const loser =
+      myRole === "prisoner" ? gameState["prisoner"].id : gameState["warder"].id;
+    const winner =
+      myRole === "prisoner" ? gameState["warder"].id : gameState["prisoner"].id;
+
+    io.sockets.to(winner).emit("surrenderResult", "you win!!!!!!!!");
+    io.sockets.to(loser).emit("surrenderResult", "you lose!!!!!!!!");
   });
 
   socket.on("chat message", (recipientUserName, messageContent) => {

@@ -8,6 +8,7 @@ import Turn from "../../components/Turn/Turn";
 import Aux from "../../hoc/Aux";
 import WaitingArea from "../../components/WaitingArea/WaitingArea";
 import "./GameArea.css";
+import Surrender from "../../components/Surrender/Surrender";
 
 import Characters from "../Characters/Characters";
 import clock from "./clock.png";
@@ -170,6 +171,12 @@ const GameArea = ({ history, location }) => {
   //   });
   // };
 
+  const surrenderHandler = () => {
+    state.socket.emit("surrender", {
+      gameCode: location.state.gameCode,
+      myRole: state.myRole,
+    });
+  };
   /*  --------------------------------------------------------------------------------------- */
 
   // run every rerendering
@@ -310,17 +317,12 @@ const GameArea = ({ history, location }) => {
       });
     });
 
-    // state.socket.on("gameWinner", (msg) => {
-    //   msg = JSON.parse(msg);
-    //   if (state.myRole === msg.myRole) {
-    //     alert(msg.winMsg);
-    //   } else {
-    //     alert(msg.loseMsg);
-    //   }
-    //   state.socket.emit("endgame");
-    //   state.socket.disconnect();
-    //   history.push("/");
-    // });
+    state.socket.on("gameWinner", (msg) => {
+      alert(msg);
+      state.socket.emit("endgame");
+      state.socket.disconnect();
+      history.push("/");
+    });
 
     state.socket.on("reset", () => {
       alert("reset from server");
@@ -329,22 +331,29 @@ const GameArea = ({ history, location }) => {
       history.push("/");
     });
 
-    console.log(state);
-  }, []);
-
-  useEffect(() => {
-    state.socket.on("gameWinner", (msg) => {
-      msg = JSON.parse(msg);
-      if (state.myRole === msg.myRole) {
-        alert(msg.winMsg);
-      } else {
-        alert(msg.loseMsg);
-      }
-      state.socket.emit("endgame");
+    state.socket.on("surrenderResult", (message) => {
+      console.log("result");
+      alert(message);
       state.socket.disconnect();
       history.push("/");
     });
-  }, [state.myRole]);
+
+    console.log(state);
+  }, []);
+
+  // useEffect(() => {
+  //   state.socket.on("gameWinner", (msg) => {
+  //     msg = JSON.parse(msg);
+  //     if (state.myRole === msg.myRole) {
+  //       alert(msg.winMsg);
+  //     } else {
+  //       alert(msg.loseMsg);
+  //     }
+  //     state.socket.emit("endgame");
+  //     state.socket.disconnect();
+  //     history.push("/");
+  //   });
+  // }, [state.myRole]);
   /* rendering part */
   let header = null;
   if (location.state.gameCode) {
@@ -385,18 +394,21 @@ const GameArea = ({ history, location }) => {
       );
 
       gameArea = (
-        <div className="game-area">
-          <Player
-            pos={state.gameState.warder.pos}
-            pic={gameSet[state.gameState.selectedChar].prisonerPic}
-          />
-          <Player
-            pos={state.gameState.prisoner.pos}
-            pic={gameSet[state.gameState.selectedChar].warderPic}
-          />
-          {blocks};
-          <Tunnel pos={state.gameState.tunnel} pic={tunnel} />
-        </div>
+        <Aux>
+          <div className="game-area">
+            <Player
+              pos={state.gameState.warder.pos}
+              pic={gameSet[state.gameState.selectedChar].warderPic}
+            />
+            <Player
+              pos={state.gameState.prisoner.pos}
+              pic={gameSet[state.gameState.selectedChar].prisonerPic}
+            />
+            {blocks};
+            <Tunnel pos={state.gameState.tunnel} pic={tunnel} />
+          </div>
+          <Surrender clicked={surrenderHandler}></Surrender>
+        </Aux>
       );
     }
   }

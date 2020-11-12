@@ -13,7 +13,7 @@ const Characters = (props) => {
         <h1 className="welcome">Choose Your Character</h1>
       </div>
       <Character name="sully" clicked={props.selectedChar} />
-      <Character name="boo" clicked={props.selectedChar} />
+      <Character name="gru" clicked={props.selectedChar} />
       <Character name="mojo" clicked={props.selectedChar} />
     </div>
   );
