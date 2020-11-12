@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <body>
+
+        <h1>Online Users : <%= numClients %> </h1>
         <% if(rooms.length > 0) { %> 
             <% for ( let room of rooms) { %> 
                     <article>
-
-                    </article>
 
                     <h1>Prisoner:</h1>
                     <h1><%= room.prisoner%></h1>
@@ -22,12 +22,16 @@
                         <li type="text" name="gameCode" id="demo"><%=room.code%></li>
                     <br>
             
-                        <a href="/reset/<%=room.code%>" class="myBtn">
+                        <!-- <a href="/reset/<%=room.code%>" class="myBtn">Reset</a> -->
+                        <div class="card__actions">
+                            <a href="/reset/<%= room.code %>" class="btn">Details</a>
+                        </div>
                     
                     </ul>
 
+                    </article>
 
-                    <article >
+                    <!-- <article >
                         <header >
                             <h1>Prisoner:</h1>
                             <p><%= room.prisoner%></p>
@@ -37,7 +41,7 @@
                         <div class="card__actions">
                             <a href="/reset/<%= room.code %>" class="btn">Details</a>
                         </div>
-                    </article>
+                    </article> -->
             <% } %> ¸
         <% } %> 
 

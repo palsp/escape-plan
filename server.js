@@ -38,6 +38,7 @@ app.post("/admin", (req, res) => {
   );
   if (adminIndex >= 0) {
     const state = GameServer.getAllState();
+    const numClinets = Object.keys(clients).length;
 
     const rooms = Object.keys(state).map((code) => {
       return {
@@ -49,6 +50,7 @@ app.post("/admin", (req, res) => {
 
     res.render("admin", {
       rooms: rooms,
+      numClients: numClinets,
     });
   } else {
     res.redirect("/");
@@ -57,7 +59,11 @@ app.post("/admin", (req, res) => {
 
 app.get("/reset/:code", (req, res) => {
   const gameCode = req.params.code;
-  GameServer.setState(gameCode, {});
+  console.log("reset game", gameCode);
+  const gameState = GameServer.getAllState();
+  delete gameState[gameCode];
+  console.log(GameServer.getAllState());
+  // GameServer.setState(gameCode, {});
 
   //return to home page
   io.in(gameCode).emit("reset");

@@ -158,19 +158,6 @@ const GameArea = ({ history, location }) => {
     state.socket.emit("selectedChar", char);
   };
 
-  // const acceptInviteHandler = (gameCode) => {
-  //   state.socket.emit("acceptInvite", gameCode);
-  //   setState((prevState) => {
-  //     return { ...prevState, showInviteMessage: false };
-  //   });
-  // };
-
-  // const rejectInviteHandler = () => {
-  //   setState((prevState) => {
-  //     return { ...prevState, showInviteMessage: false };
-  //   });
-  // };
-
   const surrenderHandler = () => {
     state.socket.emit("surrender", {
       gameCode: location.state.gameCode,
@@ -326,7 +313,7 @@ const GameArea = ({ history, location }) => {
 
     state.socket.on("reset", () => {
       alert("reset from server");
-
+      console.log("reset from server");
       state.socket.disconnect();
       history.push("/");
     });
