@@ -124,6 +124,14 @@ io.on("connection", (socket) => {
 
   // socket.on("createNewGame", roomController.createGame.bind(this, socket));
 
+  socket.on("selectedChar", (char) => {
+    const gameCode = GameServer.getGameRoom(socket.id);
+    const gameState = GameServer.getState(gameCode);
+    console.log("selected", gameState);
+    gameState.selectedChar = char;
+    console.log("assign", gameState);
+  });
+
   socket.on("createNewGame", () => {
     roomController.createGame(socket);
 

@@ -6,3 +6,7 @@
   left: 0px;
   /* background-image: url("/warderlogo.png"); */
 }
+
+.Player img {
+  height: 100%;
+}

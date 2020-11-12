@@ -8,7 +8,35 @@ import Turn from "../../components/Turn/Turn";
 import Aux from "../../hoc/Aux";
 import WaitingArea from "../../components/WaitingArea/WaitingArea";
 import "./GameArea.css";
+
+import Characters from "../Characters/Characters";
 import clock from "./clock.png";
+
+// prisoner pic
+import mojo from "../../pages/images/mojojo.png";
+import minion from "../../pages/images/minion.png";
+import boo from "../../pages/images/boo.png";
+import prisoner from "../../pages/images/prisonerlogo.png";
+
+//warder pic
+
+import gru from "../../pages/images/gru.png";
+import puff from "../../pages/images/puff.png";
+import sully from "../../pages/images/sully.png";
+import warder from "../../pages/images/warderlogo.png";
+
+// tunnel pic
+import tunnel from "../../pages/images/cave.png";
+
+// block pic
+import rock from "../../pages/images/rock.png";
+
+const gameSet = {
+  default: { prisonerPic: prisoner, warderPic: warder },
+  sully: { prisonerPic: boo, warderPic: sully },
+  mojo: { prisonerPic: mojo, warderPic: puff },
+  gru: { prisonerPic: minion, warderPic: gru },
+};
 
 const GameArea = ({ history, location }) => {
   const [state, setState] = useState({
@@ -123,6 +151,10 @@ const GameArea = ({ history, location }) => {
       name: name,
       gameCode: location.state.gameCode,
     });
+  };
+
+  const selectedCharHandler = (char) => {
+    state.socket.emit("selectedChar", char);
   };
 
   // const acceptInviteHandler = (gameCode) => {
@@ -329,14 +361,17 @@ const GameArea = ({ history, location }) => {
   }
   let infoGame = null;
   let gameArea = (
-    <WaitingArea list={state.clientList} invite={inviteUserHandler} />
+    <Aux>
+      <WaitingArea list={state.clientList} invite={inviteUserHandler} />
+      <Characters selectedChar={selectedCharHandler} />
+    </Aux>
   );
   let blocks = null;
 
   if (state.gameState) {
     if (state.gameState.warder.pos && state.gameState.prisoner.pos) {
       blocks = state.gameState.blocks.map((block) => {
-        return <Blocks pos={block} color="black" />;
+        return <Blocks pos={block} pic={rock} />;
       });
 
       infoGame = (
@@ -351,10 +386,16 @@ const GameArea = ({ history, location }) => {
 
       gameArea = (
         <div className="game-area">
-          <Player pos={state.gameState.warder.pos} color="green" />
-          <Player pos={state.gameState.prisoner.pos} color="red" />
+          <Player
+            pos={state.gameState.warder.pos}
+            pic={gameSet[state.gameState.selectedChar].prisonerPic}
+          />
+          <Player
+            pos={state.gameState.prisoner.pos}
+            pic={gameSet[state.gameState.selectedChar].warderPic}
+          />
           {blocks};
-          <Tunnel pos={state.gameState.tunnel} color="blue" />
+          <Tunnel pos={state.gameState.tunnel} pic={tunnel} />
         </div>
       );
     }

@@ -7,6 +7,7 @@ class GameState {
   blocks = [];
   turn = "";
   remainingRole = "";
+  selectedChar = "";
 
   static createGameState(id) {
     const rv = new GameState();
@@ -17,6 +18,7 @@ class GameState {
     rv[role].win = 0;
     rv.remainingRole = role === "warder" ? "prisoner" : "warder";
     rv.turn = true;
+    rv.selectedChar = "default";
     return rv;
   }
 }

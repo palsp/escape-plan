@@ -1,6 +1,6 @@
 .charctn {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   height: 100vh;
   background: url("../images/blue3.jpg");
@@ -11,4 +11,6 @@
 
 .charheader {
   margin-top: 4em;
+  display: flex;
+  flex-direction: ;
 }

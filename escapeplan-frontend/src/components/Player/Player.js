@@ -10,7 +10,9 @@ const player = (props) => {
         bottom: props.pos.y,
         backgroundColor: props.color,
       }}
-    ></div>
+    >
+      <img src={props.pic} />
+    </div>
   );
 };
 
