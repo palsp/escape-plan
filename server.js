@@ -61,6 +61,12 @@ app.get("/reset/:code", (req, res) => {
   const gameCode = req.params.code;
   console.log("reset game", gameCode);
   const gameState = GameServer.getAllState();
+  console.log("gameState", gameState);
+  const rooms = GameServer.getAllRoom();
+  delete clients[gameState[gameCode]["prisoner"].id];
+  delete clients[gameState[gameCode]["warder"].id];
+  delete rooms[gameState[gameCode]["prisoner"].id];
+  delete rooms[gameState[gameCode]["warder"].id];
   delete gameState[gameCode];
   console.log(GameServer.getAllState());
   // GameServer.setState(gameCode, {});
@@ -74,7 +80,7 @@ io.on("connection", (socket) => {
   // tell other clients that you joined
   console.log(socket.id, "user connected");
   socket.on("greeting", (username) => {
-    console.log("greeting");
+    console.log("greeting", username);
     clients[socket.id] = username;
     socket.broadcast.emit("userJoin", { name: username });
   });
@@ -262,6 +268,12 @@ io.on("connection", (socket) => {
       myRole === "prisoner" ? gameState["prisoner"].id : gameState["warder"].id;
     const winner =
       myRole === "prisoner" ? gameState["warder"].id : gameState["prisoner"].id;
+
+    delete GameServer.getAllRoom()[winner];
+    delete GameServer.getAllRoom()[loser];
+    delete GameServer.getAllState()[gameCode];
+    delete clients[winner];
+    delete clients[loser];
 
     io.sockets.to(winner).emit("surrenderResult", "you win!!!!!!!!");
     io.sockets.to(loser).emit("surrenderResult", "you lose!!!!!!!!");
