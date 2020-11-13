@@ -208,10 +208,10 @@ io.on("connection", (socket) => {
       // warder win this round
       gameState["warder"].win += 1;
       if (gameState["warder"].win === 3) {
-        socket
+        io.sockets
           .to(gameState["prisoner"].id)
           .emit("gameWinner", "You lose !!!!!!!!!");
-        socket
+        io.sockets
           .to(gameState["warder"].id)
           .emit("gameWinner", "you win !!!!!!!!!");
         // gameState = {};
