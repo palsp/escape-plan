@@ -1,6 +1,6 @@
 #Escape Plan 
 
- - Multiplayer game ( Still in development process) 
+ - Multiplayer game 
  - using express framework with socket.io for backend part(Server)
  - using React framework for frontend part(Client)
  
