@@ -8,6 +8,7 @@ const WaitingArea = (props) => {
   });
 
   return (
+
     <div className="new-waiting">
       <h1>Waiting for your opponents</h1>
       {clientList}

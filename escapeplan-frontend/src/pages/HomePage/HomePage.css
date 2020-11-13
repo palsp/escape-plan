@@ -95,6 +95,7 @@ line-height: 96px;
   font-weight: bolder;
 }
 
+
 .myButton {
   box-shadow: 0px 10px 14px -7px #276873;
   background: linear-gradient(to bottom, #599bb3 5%, #408c99 100%);
@@ -143,4 +144,5 @@ line-height: 96px;
 .myButton3:active {
   position: relative;
   top: 1px;
+
 }

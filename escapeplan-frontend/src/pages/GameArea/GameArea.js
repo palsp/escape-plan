@@ -12,6 +12,27 @@ import Surrender from "../../components/Surrender/Surrender";
 
 import Characters from "../Characters/Characters";
 import clock from "./clock.png";
+import Surrender from "../../components/Surrender/Surrender";
+import Characters from "../../components/Characters/Characters";
+
+// prisoner character
+import boo from "../../pages/images/boo.png";
+import minion from "../../pages/images/minion.png";
+import mojo from "../../pages/images/mojo.png";
+import prisoner from "../../pages/images/prisonerlogo.png";
+
+// //warder character
+import sully from "../../pages/images/sully.png";
+import gru from "../../pages/images/gru.png";
+import puff from "../../pages/images/puff.png";
+import warder from "../../pages/images/warderlogo.png";
+
+const gameSet = {
+  defalut: { prisonerPic: prisoner, warderPic: warder },
+  bubble: { prisonerPic: mojo, warderPic: puff },
+  gru: { prisonerPic: minion, warderPic: gru },
+  sully: { prisonerPic: boo, warderPic: sully },
+};
 
 // prisoner pic
 import mojo from "../../pages/images/mojojo.png";
@@ -50,6 +71,7 @@ const GameArea = ({ history, location }) => {
     timer: 10,
     destroyMode: false,
     clientList: [],
+    characterSet: gameSet.defalut,
   });
 
   /*  method */
@@ -154,6 +176,7 @@ const GameArea = ({ history, location }) => {
     });
   };
 
+
   const selectedCharHandler = (char) => {
     state.socket.emit("selectedChar", char);
   };
@@ -163,6 +186,7 @@ const GameArea = ({ history, location }) => {
       gameCode: location.state.gameCode,
       myRole: state.myRole,
     });
+
   };
   /*  --------------------------------------------------------------------------------------- */
 
@@ -228,6 +252,7 @@ const GameArea = ({ history, location }) => {
     });
 
     state.socket.on("updateTimer", (time) => {
+      console.log("Time", typeof time, time);
       setState((prevState) => {
         return { ...prevState, timer: time };
       });
@@ -304,6 +329,7 @@ const GameArea = ({ history, location }) => {
       });
     });
 
+
     state.socket.on("gameWinner", (msg) => {
       console.log("gameWinner");
       alert(msg);
@@ -329,19 +355,8 @@ const GameArea = ({ history, location }) => {
     console.log(state);
   }, []);
 
-  // useEffect(() => {
-  //   state.socket.on("gameWinner", (msg) => {
-  //     msg = JSON.parse(msg);
-  //     if (state.myRole === msg.myRole) {
-  //       alert(msg.winMsg);
-  //     } else {
-  //       alert(msg.loseMsg);
-  //     }
-  //     state.socket.emit("endgame");
-  //     state.socket.disconnect();
-  //     history.push("/");
-  //   });
-  // }, [state.myRole]);
+
+
   /* rendering part */
 
   let header = null;
@@ -355,6 +370,7 @@ const GameArea = ({ history, location }) => {
     <Aux>
       <WaitingArea list={state.clientList} invite={inviteUserHandler} />
       <Characters selectedChar={selectedCharHandler} />
+
     </Aux>
   );
   let blocks = null;
@@ -392,6 +408,7 @@ const GameArea = ({ history, location }) => {
           <div>
           <Surrender clicked={surrenderHandler}></Surrender>
           </div>
+
         </Aux>
       );
     }

@@ -31,14 +31,14 @@ p {
 }
 
 .center {
+  margin: 2em 0 2em;
   justify-content: center;
-  margin-inline-end: 2em;
   align-items: center;
   width: calc(100% - 20em);
 }
 
 .containerhow {
-  margin-top: 5%;
+  margin-top: 10%;
   display: flex;
   flex-direction: row;
   margin: auto;
@@ -71,6 +71,7 @@ p {
   background-color: rgba(102, 141, 141, 0.87);
   border: none;
   margin-right: 2em;
+  padding: 10px;
 }
 
 .prisoner {
@@ -78,6 +79,7 @@ p {
   background-color: rgba(102, 141, 141, 0.87);
   border: none;
   margin-right: 2em;
+  padding: 10px;
 }
 
 .button {
@@ -91,5 +93,16 @@ p {
 }
 
 .wasd {
-  margin-top: 0em;
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.buttonback {
+  margin-left: 1em;
+  /* text-align: center; */
+  padding: 2px;
+  background-color: rgba(165, 196, 196, 0.87);
+  border: none;
+  text-decoration: none;
+  font-size: 16px;
 }

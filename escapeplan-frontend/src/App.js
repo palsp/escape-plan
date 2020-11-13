@@ -7,6 +7,9 @@ import StartGame from "./pages/StartGame/StartGame";
 import GameArea from "./pages/GameArea/GameArea";
 import Invite from "./components/Invite/Invite";
 
+import Character from "./components/Characters/Characters";
+
+
 import WaitingArea from "./components/WaitingArea/WaitingArea";
 
 function App() {
@@ -22,6 +25,7 @@ function App() {
 
           <Route path="/invite" exact component={Invite}></Route>
           {/* <Route path="/timer" exact component={Timer2}></Route> */}
+          <Route path="/char" exact component={Character} />
 
           <Route path="/howtoplay" exact component={HowToPlay}></Route>
         </Switch>

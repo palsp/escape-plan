@@ -182,8 +182,10 @@ const HomePage = ({ history }) => {
         </div>
 
         <div className="container">
+
           <button className="myButton" onClick={startGameHandler}>
             Start Game
+
           </button>
 
           <br></br>
