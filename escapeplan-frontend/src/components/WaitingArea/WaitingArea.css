@@ -1,9 +1,8 @@
-
 .new-waiting {
   height: 50.5vh;
   border: white solid;
   background-color: rgb(223, 241, 226);
-
+}
 .waiting {
   display: flex;
   align-items: center;

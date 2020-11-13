@@ -8,31 +8,10 @@ import Turn from "../../components/Turn/Turn";
 import Aux from "../../hoc/Aux";
 import WaitingArea from "../../components/WaitingArea/WaitingArea";
 import "./GameArea.css";
-import Surrender from "../../components/Surrender/Surrender";
 
-import Characters from "../Characters/Characters";
 import clock from "./clock.png";
 import Surrender from "../../components/Surrender/Surrender";
 import Characters from "../../components/Characters/Characters";
-
-// prisoner character
-import boo from "../../pages/images/boo.png";
-import minion from "../../pages/images/minion.png";
-import mojo from "../../pages/images/mojo.png";
-import prisoner from "../../pages/images/prisonerlogo.png";
-
-// //warder character
-import sully from "../../pages/images/sully.png";
-import gru from "../../pages/images/gru.png";
-import puff from "../../pages/images/puff.png";
-import warder from "../../pages/images/warderlogo.png";
-
-const gameSet = {
-  defalut: { prisonerPic: prisoner, warderPic: warder },
-  bubble: { prisonerPic: mojo, warderPic: puff },
-  gru: { prisonerPic: minion, warderPic: gru },
-  sully: { prisonerPic: boo, warderPic: sully },
-};
 
 // prisoner pic
 import mojo from "../../pages/images/mojojo.png";
@@ -176,7 +155,6 @@ const GameArea = ({ history, location }) => {
     });
   };
 
-
   const selectedCharHandler = (char) => {
     state.socket.emit("selectedChar", char);
   };
@@ -186,7 +164,6 @@ const GameArea = ({ history, location }) => {
       gameCode: location.state.gameCode,
       myRole: state.myRole,
     });
-
   };
   /*  --------------------------------------------------------------------------------------- */
 
@@ -329,7 +306,6 @@ const GameArea = ({ history, location }) => {
       });
     });
 
-
     state.socket.on("gameWinner", (msg) => {
       console.log("gameWinner");
       alert(msg);
@@ -355,8 +331,6 @@ const GameArea = ({ history, location }) => {
     console.log(state);
   }, []);
 
-
-
   /* rendering part */
 
   let header = null;
@@ -364,13 +338,11 @@ const GameArea = ({ history, location }) => {
     header = <p> Your gameCode is : {location.state.gameCode}</p>;
   }
 
-  
   let infoGame = null;
   let gameArea = (
     <Aux>
       <WaitingArea list={state.clientList} invite={inviteUserHandler} />
       <Characters selectedChar={selectedCharHandler} />
-
     </Aux>
   );
   let blocks = null;
@@ -382,7 +354,7 @@ const GameArea = ({ history, location }) => {
       });
 
       infoGame = (
-        <div >
+        <div>
           <img src={clock} className="clock" width="95"></img>
           <Timer timer={state.timer} />
           <h3>Your Role is : {state.myRole}</h3>
@@ -406,27 +378,20 @@ const GameArea = ({ history, location }) => {
             <Tunnel pos={state.gameState.tunnel} pic={tunnel} />
           </div>
           <div>
-          <Surrender clicked={surrenderHandler}></Surrender>
+            <Surrender clicked={surrenderHandler}></Surrender>
           </div>
-
         </Aux>
       );
     }
   }
 
   if (state.gameStart) {
-    header = (
-      <Aux>
-        {infoGame}
-      </Aux>
-    );
+    header = <Aux>{infoGame}</Aux>;
   }
 
   return (
     <div className="playhome">
-      <div className="content1">
-        {header}
-      </div>
+      <div className="content1">{header}</div>
       {gameArea}
     </div>
   );
