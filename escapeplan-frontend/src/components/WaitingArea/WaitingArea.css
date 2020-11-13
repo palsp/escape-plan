@@ -1,3 +1,9 @@
+
+.new-waiting {
+  height: 50.5vh;
+  border: white solid;
+  background-color: rgb(223, 241, 226);
+
 .waiting {
   display: flex;
   align-items: center;
@@ -6,6 +12,8 @@
   background-color: blueviolet;
   background-repeat: no-repeat;
   background-size: cover;
+  display: flex;
+  align-items: center;
 }
 
 .wait {

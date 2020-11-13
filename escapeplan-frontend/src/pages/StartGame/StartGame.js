@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 
 import "./StartGame.css";
 
+
 import host from "./host.png";
 import publicpic from "./public.png";
 import privatepic from "./private.png";
 import Socket from "../../Socket";
 import PublicRoom from "../../components/PublicRoom/PublicRoom";
+import Chat from "../../components/Chat/Chat"
 
 function StartGame({ history }) {
   const [username, setUserName] = useState();
@@ -20,9 +22,13 @@ function StartGame({ history }) {
   // const [clientList, setClientList] = useState([]);
 
   const newGameHandler = () => {
-    socket.emit("createNewGame");
+    if(username){
+      socket.emit("createNewGame");
     console.log("name", username);
     // socket.emit("greeting", username);
+    }else {
+      alert("Please enter your name first")
+    }
   };
 
   const inputNameHandler = (event) => {
@@ -106,13 +112,16 @@ function StartGame({ history }) {
   }, [socket]);
 
   useEffect(() => {
-    socket.on("invite", ({ fromUser, gameCode }) => {
-      console.log("receive from", fromUser, "to", gameCode);
-      console.log("receive invite");
-      setFromUser(fromUser);
-      setInviteToGameCode(gameCode);
-      setShowInviteMessage(true);
-    });
+   
+      socket.on("invite", ({ fromUser, gameCode }) => {
+        console.log("receive from", fromUser, "to", gameCode);
+        console.log("receive invite");
+        setFromUser(fromUser);
+        setInviteToGameCode(gameCode);
+        setShowInviteMessage(true);
+
+      });
+    
   }, []);
 
   let invite = null;
@@ -129,7 +138,7 @@ function StartGame({ history }) {
   if (showInviteMessage) {
     inviteMessage = (
       <label>
-        <p>Receive invite from {fromUser}</p>
+        <h1 className="stylebutton">Receive invite from {fromUser}</h1>
         <button onClick={() => acceptInviteHandler(inviteToGameCode)}>
           {" "}
           Accept
@@ -144,25 +153,29 @@ function StartGame({ history }) {
       {display}
       {inviteMessage}
 
-      <div className="enter">
-        <h1 className="welcome">Enter Your Name</h1>
-        <br></br>
+      <div className="start">
+      <h1 className="stylenickname">Enter your nickname</h1>
 
-        <input
-          type="text"
-          name="playername"
-          onChange={inputNameHandler}
-          value={username}
-        ></input>
-        <button onClick={submitHandler}>Enter NickName</button>
+        <div></div>
+        <br></br>
+        <div className="flex-row">
+          <input
+            type="text"
+            text-size="20px"
+            name="playername"
+            onChange={inputNameHandler}
+            value={username}
+            placeholder="Please Enter Your Name"/>
+          <button className="myButton" onClick={submitHandler}><p className="stylebutton">Enter</p></button>
+        </div>
       </div>
       <div className="buttonn">
         <div className="buttons1">
           <h3>Host</h3>
           <img src={host} className="host" width="95"></img>
           <br></br>
-          <button className="designbut" onClick={newGameHandler}>
-            <p>Create Game</p>
+          <button className="myButton" onClick={newGameHandler}>
+            <p className="stylebutton">Create Game</p>
           </button>
         </div>
 
@@ -170,30 +183,38 @@ function StartGame({ history }) {
           <h3>Public Room</h3>
           <img src={publicpic} className="host" width="95"></img>
           <br></br>
-          <button className="designbut" onClick={findRoomHandler}>
-            Find Game
+          <button className="myButton" onClick={findRoomHandler}>
+          <p className="stylebutton">Find Game</p>
           </button>
         </div>
 
         <div className="buttons3">
           <h3>Private Room</h3>
           <img src={privatepic} className="host" width="95"></img>
-          <br></br>
 
           {/* <button className="designbut">
             <p>Enter Code</p>
           </button> */}
           <label>
-            <input
+            <input className="sizeinput"
               type="text"
               name="gameCode"
               onChange={inputGameCodeHandler}
               className="inputcode"
+              width="800px;"
             />
-            <button onClick={joinWithCodeHandler}>Join Room</button>
+            <button className="myButton" onClick={joinWithCodeHandler}><p className="stylebutton">Join Room</p></button>
           </label>
-        </div>
+        </div>  
+
+        <div className="buttons3">
+       <Chat name={username}></Chat>
+       </div>
       </div>
+
+      <div style={{display:'flex', justifyContent:'center', height:"100vh"}}>
+      </div>
+    
     </div>
   );
 }

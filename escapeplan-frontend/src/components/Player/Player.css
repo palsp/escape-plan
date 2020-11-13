@@ -7,13 +7,6 @@
   /* background-image: url("/warderlogo.png"); */
 }
 
-.Logo {
-  background-color: white;
-  padding: 8px;
-  height: 100%;
-  box-sizing: border-box;
-  border-radius: 5px;
-}
 
 .Player img {
   height: 100%;

@@ -1,0 +1,21 @@
+.buttonnn {
+  /* margin-top: 2em; */
+  display: flex;
+  flex-direction: row;
+  width: calc(100%-20em);
+  /* height: 100vh;  */
+}
+
+.buttons1 {
+  margin: 2em 1em 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 80px;
+  width: 300px;
+}
+
+.design {
+  border-style: none;
+  flex-direction: row;
+}

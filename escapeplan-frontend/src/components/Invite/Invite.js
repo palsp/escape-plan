@@ -10,7 +10,7 @@ const Invite = (props) => {
       <div className="player">
         <h1 className="invitetext">prim</h1>
         <br></br>
-        <button>Invite</button>
+        <button className="myButton">Invite</button>
       </div>
 
       <h1>Loading spinner</h1>

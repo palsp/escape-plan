@@ -12,7 +12,6 @@ const GameServer = require("./models/server");
 const { gameReset, destroyblock } = require("./util/game");
 const bodyParser = require("body-parser");
 
-let timer = 10;
 let admins = [{ username: "pal", password: "12345" }];
 let onlineUsers = 0;
 let intervalId;
@@ -39,6 +38,7 @@ app.post("/admin", (req, res) => {
   );
   if (adminIndex >= 0) {
     const state = GameServer.getAllState();
+    const numClinets = Object.keys(clients).length;
 
     const rooms = Object.keys(state).map((code) => {
       return {
@@ -50,6 +50,7 @@ app.post("/admin", (req, res) => {
 
     res.render("admin", {
       rooms: rooms,
+      numClients: numClinets,
     });
   } else {
     res.redirect("/");
@@ -58,7 +59,17 @@ app.post("/admin", (req, res) => {
 
 app.get("/reset/:code", (req, res) => {
   const gameCode = req.params.code;
-  GameServer.setState(gameCode, {});
+  console.log("reset game", gameCode);
+  const gameState = GameServer.getAllState();
+  console.log("gameState", gameState);
+  const rooms = GameServer.getAllRoom();
+  delete clients[gameState[gameCode]["prisoner"].id];
+  delete clients[gameState[gameCode]["warder"].id];
+  delete rooms[gameState[gameCode]["prisoner"].id];
+  delete rooms[gameState[gameCode]["warder"].id];
+  delete gameState[gameCode];
+  console.log(GameServer.getAllState());
+  // GameServer.setState(gameCode, {});
 
   //return to home page
   io.in(gameCode).emit("reset");
@@ -67,8 +78,9 @@ app.get("/reset/:code", (req, res) => {
 
 io.on("connection", (socket) => {
   // tell other clients that you joined
+  console.log(socket.id, "user connected");
   socket.on("greeting", (username) => {
-    console.log("greeting");
+    console.log("greeting", username);
     clients[socket.id] = username;
     socket.broadcast.emit("userJoin", { name: username });
   });
@@ -79,21 +91,15 @@ io.on("connection", (socket) => {
       return id !== socket.id && !rooms[id];
     });
 
-    // console.log("socket", socket.id, clients[socket.id]);
-
     clientList = clientList.map((id) => {
       return { name: clients[id] };
     });
 
-    // console.log("list", clientList);
-    // console.log("with name", clientList);
     socket.emit("userList", JSON.stringify({ clientList: clientList }));
   });
 
   // invited other users
   socket.on("inviteUser", ({ name, gameCode }) => {
-    // const clients = GameServer.getAllClients();
-    // console.log("inviteUser", gameCode);
     const userIndex = Object.keys(clients).findIndex((id) => {
       return clients[id] === name;
     });
@@ -108,14 +114,32 @@ io.on("connection", (socket) => {
     console.log("accept invite");
     roomController.joinGame(socket, gameCode);
   });
+
+  socket.on("selectedChar", (char) => {
+    const gameCode = GameServer.getGameRoom(socket.id);
+    const gameState = GameServer.getState(gameCode);
+    gameState.selectedChar = char;
+  });
+
   socket.on("getAllRoom", () => {});
-  console.log("User is connected", onlineUsers);
   onlineUsers++;
   io.emit("onlineUsers", onlineUsers);
 
   socket.on("disconnect", () => {
     onlineUsers--;
+    console.log(socket.id, "socket disconnect");
     io.emit("onlineUsers", onlineUsers);
+
+    // final added
+    const state = GameServer.getAllState();
+    const rooms = GameServer.getAllRoom();
+    const gameCode = rooms[socket.id];
+
+    delete state[gameCode];
+    delete rooms[socket.id];
+    delete clients[socket.id];
+
+    // final added
   });
 
   socket.on("chatMessage", ({ name, message }) => {
@@ -136,7 +160,9 @@ io.on("connection", (socket) => {
 
     socket.broadcast.emit("updateClientList", { name: clients[socket.id] });
   });
+
   socket.on("joinRoom", roomController.joinGame.bind(this, socket));
+
   socket.on("requestAllRoom", roomController.getAllRoom.bind(this, socket));
 
   socket.on("destroyblock", (data) => {
@@ -156,7 +182,8 @@ io.on("connection", (socket) => {
       gameState = updatedState;
     }
     gameState.turn = !gameState.turn;
-    timer = 10;
+    // timer = 10;
+    gameState.timer = 10;
     return io.in(gameCode).emit("destroyBlock", JSON.stringify(gameState));
   });
 
@@ -169,44 +196,45 @@ io.on("connection", (socket) => {
       // continue game
       console.log("continue game in game loop");
       gameState.turn = !gameState.turn;
-      // resetTimer();
-      timer = 10;
+      // timer = 10;
+      gameState.timer = 10;
       return io.in(gameCode).emit("gameContinue", JSON.stringify(gameState));
     } else if (winner === 1) {
       //  prisoner win this round
       gameState["prisoner"].win += 1;
       if (gameState["prisoner"].win === 3) {
-        gameState = {};
-        return io.in(gameCode).emit(
-          "gameWinner",
-          JSON.stringify({
-            myRole: "prisoner",
-            winMsg: "Congratulation!!!",
-            loseMsg: "You lose!!!!!",
-          })
-        );
+        io.sockets
+          .to(gameState["prisoner"].id)
+          .emit("gameWinner", "You win !!!!!!!!!");
+        io.sockets
+          .to(gameState["warder"].id)
+          .emit("gameWinner", "you lose !!!!!!!!!");
+        // gameState = {};
+        delete gameState;
+        return;
       }
       gameState = gameReset(gameState, "prisoner");
-      // resetTimer();
-      timer = 10;
+      // timer  = 10
+      gameState.timer = 10;
       return io.in(gameCode).emit("prisonerWin", JSON.stringify(gameState));
     } else if (winner === 2) {
       // warder win this round
       gameState["warder"].win += 1;
       if (gameState["warder"].win === 3) {
-        gameState = {};
-        // clear game Room
-        return io.in(gameCode).emit(
-          "gameWinner",
-          JSON.stringify({
-            myRole: "warder",
-            winMsg: "Congratulation!!!",
-            loseMsg: "You lose!!!!!",
-          })
-        );
+        io.sockets
+          .to(gameState["prisoner"].id)
+          .emit("gameWinner", "You lose !!!!!!!!!");
+        io.sockets
+          .to(gameState["warder"].id)
+          .emit("gameWinner", "you win !!!!!!!!!");
+        // gameState = {};
+        delete gameState;
+        return;
       }
       gameState = gameReset(gameState, "warder");
-      timer = 10;
+      // timer = 10;
+      gameState.timer = 10;
+
       return io.in(gameCode).emit("warderWin", JSON.stringify(gameState));
     }
   });
@@ -215,22 +243,47 @@ io.on("connection", (socket) => {
     const gameCode = GameServer.getGameRoom(socket.id);
     const gameState = GameServer.getState(gameCode);
     io.in(gameCode).emit("gameStart", JSON.stringify(gameState));
-    console.log("user emit ready");
+    console.log(socket.id, "user emit ready");
 
     intervalId = setInterval(() => {
-      timer -= 1;
-      io.in(gameCode).emit("updateTimer", timer);
-      if (timer === 0) {
-        timer = 10;
+      gameState.timer -= 1;
+      io.in(gameCode).emit("updateTimer", gameState.timer);
+      if (gameState.timer === 0) {
+        // timer = 10;
+        gameState.timer = 10;
         gameState.turn = !gameState.turn;
         io.in(gameCode).emit("switchTurn", gameState.turn);
       }
     }, 1000);
   });
 
-  socket.on("endgame", () => {
+  socket.on("endgame", (gameCode) => {
     clearInterval(intervalId);
-    timer = 10;
+    //timer = 10;
+
+    /* clean up */
+    delete GameServer.getAllState()[gameCode];
+    delete GameServer.getAllRoom()[socket.id];
+    delete clients[socket.id];
+  });
+
+  socket.on("surrender", ({ gameCode, myRole }) => {
+    const gameState = GameServer.getState(gameCode);
+    console.log(gameState, gameCode);
+
+    const loser =
+      myRole === "prisoner" ? gameState["prisoner"].id : gameState["warder"].id;
+    const winner =
+      myRole === "prisoner" ? gameState["warder"].id : gameState["prisoner"].id;
+
+    delete GameServer.getAllRoom()[winner];
+    delete GameServer.getAllRoom()[loser];
+    delete GameServer.getAllState()[gameCode];
+    delete clients[winner];
+    delete clients[loser];
+
+    io.sockets.to(winner).emit("surrenderResult", "you win!!!!!!!!");
+    io.sockets.to(loser).emit("surrenderResult", "you lose!!!!!!!!");
   });
 
   socket.on("chat message", (recipientUserName, messageContent) => {

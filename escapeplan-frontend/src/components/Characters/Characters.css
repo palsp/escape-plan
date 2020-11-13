@@ -1,0 +1,19 @@
+.charctn {
+  display: flex;
+  margin: 1em 0 2em;
+  flex-direction: column;
+  /* height: 20em; */
+  width: 50em;
+  /* align-items: center; */
+  /* /background: url("../images/blue3.jpg"); */
+  background-repeat: no-repeat;
+  /* overflow: hidden; */
+  background-size: cover;
+  /* background-color: black; */
+}
+
+.charheader {
+  margin-top: 2em;
+  display: flex;
+  /* flex-direction: column; */
+}

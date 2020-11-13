@@ -1,5 +1,5 @@
 import React from "react";
-
+import "./WaitingArea.css";
 import Client from "./Client/Client";
 const WaitingArea = (props) => {
   console.log("in waiting area", props.list);
@@ -8,11 +8,10 @@ const WaitingArea = (props) => {
   });
 
   return (
-    <div className="waiting">
-      <div className="opp">
-        <h0 className="wait">Waiting for your opponents</h0>
-        {clientList}
-      </div>
+
+    <div className="new-waiting">
+      <h1>Waiting for your opponents</h1>
+      {clientList}
     </div>
   );
 };

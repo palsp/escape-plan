@@ -8,6 +8,9 @@ import Turn from "../../components/Turn/Turn";
 import Aux from "../../hoc/Aux";
 import WaitingArea from "../../components/WaitingArea/WaitingArea";
 import "./GameArea.css";
+import Surrender from "../../components/Surrender/Surrender";
+
+import Characters from "../Characters/Characters";
 import clock from "./clock.png";
 import Surrender from "../../components/Surrender/Surrender";
 import Characters from "../../components/Characters/Characters";
@@ -29,6 +32,32 @@ const gameSet = {
   bubble: { prisonerPic: mojo, warderPic: puff },
   gru: { prisonerPic: minion, warderPic: gru },
   sully: { prisonerPic: boo, warderPic: sully },
+};
+
+// prisoner pic
+import mojo from "../../pages/images/mojojo.png";
+import minion from "../../pages/images/minion.png";
+import boo from "../../pages/images/boo.png";
+import prisoner from "../../pages/images/prisonerlogo.png";
+
+//warder pic
+
+import gru from "../../pages/images/gru.png";
+import puff from "../../pages/images/puff.png";
+import sully from "../../pages/images/sully.png";
+import warder from "../../pages/images/warderlogo.png";
+
+// tunnel pic
+import tunnel from "../../pages/images/flag.png";
+
+// block pic
+import rock from "../../pages/images/rockk.png";
+
+const gameSet = {
+  default: { prisonerPic: prisoner, warderPic: warder },
+  sully: { prisonerPic: boo, warderPic: sully },
+  mojo: { prisonerPic: mojo, warderPic: puff },
+  gru: { prisonerPic: minion, warderPic: gru },
 };
 
 const GameArea = ({ history, location }) => {
@@ -147,16 +176,17 @@ const GameArea = ({ history, location }) => {
     });
   };
 
+
+  const selectedCharHandler = (char) => {
+    state.socket.emit("selectedChar", char);
+  };
+
   const surrenderHandler = () => {
     state.socket.emit("surrender", {
       gameCode: location.state.gameCode,
       myRole: state.myRole,
     });
-  };
 
-  const selectCharacterHandler = (char) => {
-    // console.log("selected Char", char);
-    state.socket.emit("selectedChar", char);
   };
   /*  --------------------------------------------------------------------------------------- */
 
@@ -299,9 +329,25 @@ const GameArea = ({ history, location }) => {
       });
     });
 
+
+    state.socket.on("gameWinner", (msg) => {
+      console.log("gameWinner");
+      alert(msg);
+      state.socket.emit("endgame", location.state.gameCode);
+      state.socket.disconnect();
+      history.push("/");
+    });
+
     state.socket.on("reset", () => {
       alert("reset from server");
+      console.log("reset from server");
+      state.socket.disconnect();
+      history.push("/");
+    });
 
+    state.socket.on("surrenderResult", (message) => {
+      console.log("result");
+      alert(message);
       state.socket.disconnect();
       history.push("/");
     });
@@ -309,48 +355,22 @@ const GameArea = ({ history, location }) => {
     console.log(state);
   }, []);
 
-  useEffect(() => {
-    state.socket.on("gameWinner", (msg) => {
-      msg = JSON.parse(msg);
-      if (state.myRole === msg.myRole) {
-        alert(msg.winMsg);
-      } else {
-        alert(msg.loseMsg);
-      }
-      state.socket.emit("endgame", location.state.gameCode);
-      state.socket.disconnect();
-      history.push("/");
-    });
 
-    state.socket.on("surrenderResult", (message) => {
-      if (state.myRole === message.myRole) {
-        alert(message.loseMsg);
-      } else {
-        alert(message.winMsg);
-      }
-      state.socket.disconnect();
-      history.push("/");
-    });
-  }, [state.myRole]);
+
   /* rendering part */
+
   let header = null;
   if (location.state.gameCode) {
     header = <p> Your gameCode is : {location.state.gameCode}</p>;
   }
 
-  if (state.gameStart) {
-    header = (
-      <Aux>
-        <Timer timer={state.timer} />
-        {/* <Turn turn={gameState.turn} /> */}
-      </Aux>
-    );
-  }
+  
   let infoGame = null;
   let gameArea = (
     <Aux>
       <WaitingArea list={state.clientList} invite={inviteUserHandler} />
-      <Characters selectChar={selectCharacterHandler} />
+      <Characters selectedChar={selectedCharHandler} />
+
     </Aux>
   );
   let blocks = null;
@@ -358,14 +378,14 @@ const GameArea = ({ history, location }) => {
   if (state.gameState) {
     if (state.gameState.warder.pos && state.gameState.prisoner.pos) {
       blocks = state.gameState.blocks.map((block) => {
-        return <Blocks pos={block} color="black" />;
+        return <Blocks pos={block} pic={rock} />;
       });
 
       infoGame = (
-        <div className="content1">
+        <div >
           <img src={clock} className="clock" width="95"></img>
+          <Timer timer={state.timer} />
           <h3>Your Role is : {state.myRole}</h3>
-          {header}
           <h3>Win Count : {state.winCount}</h3>
           <Turn turn={state.turn} />
         </div>
@@ -376,35 +396,38 @@ const GameArea = ({ history, location }) => {
           <div className="game-area">
             <Player
               pos={state.gameState.warder.pos}
-              color="green"
               pic={gameSet[state.gameState.selectedChar].warderPic}
             />
             <Player
               pos={state.gameState.prisoner.pos}
-              color="red"
               pic={gameSet[state.gameState.selectedChar].prisonerPic}
             />
             {blocks};
-            <Tunnel pos={state.gameState.tunnel} color="blue" />
+            <Tunnel pos={state.gameState.tunnel} pic={tunnel} />
           </div>
-          <Surrender clicked={surrenderHandler} />
+          <div>
+          <Surrender clicked={surrenderHandler}></Surrender>
+          </div>
+
         </Aux>
       );
     }
   }
 
+  if (state.gameStart) {
+    header = (
+      <Aux>
+        {infoGame}
+      </Aux>
+    );
+  }
+
   return (
     <div className="playhome">
-      {/* {inviteMessage} */}
       <div className="content1">
-        <img src={clock} className="clock" width="95"></img>
-        <h3>Your Role is : {state.myRole}</h3>
         {header}
-        <h3>Win Count : {state.winCount}</h3>
-        <Turn turn={state.turn} />
       </div>
       {gameArea}
-      {/* <div className="game-area">{gameArea}</div> */}
     </div>
   );
 };
