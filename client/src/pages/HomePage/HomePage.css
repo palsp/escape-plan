@@ -1,0 +1,146 @@
+/* ESCAPE PLAN */
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100&display=swap");
+
+@media only screen and (min-width: 768px) {
+  body {
+    font-size: 20px;
+  }
+  button {
+    width: 60% !important;
+  }
+  input {
+    width: calc(60% - 1em) !important;
+  }
+}
+
+.submittext {
+  z-index: 10;
+}
+h1 {
+  font-family: "Noto Sans JP", sans-serif;
+  text-align: center;
+  font-size: 20px;
+  color: black;
+}
+.welcome {
+  line-height: 8%;
+  font-family: "Noto Sans JP", sans-serif;
+  text-align: center;
+  font-size: 50px;
+  text-shadow: #ffffff;
+  color: #ffffff;
+}
+
+.headctn {
+  margin-top: 12em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  background: url("../../assets/background.jpg");
+  background-repeat: no-repeat;
+  overflow: hidden;
+  background-size: cover;
+}
+.container {
+  margin: 2em 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(100% - 40em);
+}
+
+.center {
+  /* width: 366px;
+height: 96px;
+left: 537px;
+top: 319px;
+
+text-transform: uppercase;
+font-style: normal;
+font-weight: normal;
+font-size: 72px;
+line-height: 96px;
+*/
+  text-align: center;
+
+  color: #ffffff;
+}
+
+.hp {
+  background-color: rgba(165, 196, 196, 0.87);
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+.howto:hover {
+  -webkit-transform: scale(1.05); /*Grows in size like Angry Birds button*/
+  -moz-transform: scale(1.05);
+  -ms-transform: scale(1.05);
+  -o-transform: scale(1.05);
+}
+
+.submittext {
+  margin-top: 2em;
+  display: flex;
+  width: calc(100%-60em);
+  font-size: 13px;
+  font-family: "Noto Sans JP", sans-serif;
+  font-weight: bolder;
+}
+
+.myButton {
+  box-shadow: 0px 10px 14px -7px #276873;
+  background: linear-gradient(to bottom, #599bb3 5%, #408c99 100%);
+  background-color: #599bb3;
+  border-radius: 8px;
+  display: inline-block;
+  cursor: pointer;
+  color: #ffffff;
+  font-family: Arial;
+  font-size: 20px;
+  font-weight: bold;
+  text-decoration: none;
+  text-shadow: 0px 1px 0px #3d768a;
+  width: 20px;
+  height: 80px;
+}
+.myButton:hover {
+  background: linear-gradient(to bottom, #408c99 5%, #599bb3 100%);
+  background-color: #408c99;
+}
+.myButton:active {
+  position: relative;
+  top: 1px;
+}
+
+.myButton3 {
+  margin-top: 1em;
+  box-shadow: 0px 1px 0px 0px #1c1b18;
+  background: linear-gradient(to bottom, #eae0c2 5%, #ccc2a6 100%);
+  background-color: #eae0c2;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #505739;
+  font-family: Arial;
+  font-size: 30px;
+  font-weight: bold;
+  padding: 0px 10px;
+  text-decoration: none;
+  text-shadow: 0px 1px 0px #ffffff;
+  width: 100px;
+}
+.myButton3:hover {
+  background: linear-gradient(to bottom, #ccc2a6 5%, #eae0c2 100%);
+  background-color: #ccc2a6;
+}
+.myButton3:active {
+  position: relative;
+  top: 1px;
+}

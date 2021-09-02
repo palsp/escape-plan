@@ -1,0 +1,24 @@
+version: "3.4"
+services:
+  api:
+    restart: always
+    build:
+      context: ./server
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+  client:
+    build:
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+  nginx:
+    restart: always
+    build:
+      context: ./nginx
+    ports:
+      - 3000:80
+    depends_on:
+      - api
+      - client
