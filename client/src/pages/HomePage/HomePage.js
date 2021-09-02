@@ -10,7 +10,8 @@ export const UserContext = React.createContext();
 
 const HomePage = ({ history }) => {
   useEffect(() => {
-    const socket = openSocket(`${window.location.origin}/api`);
+    const url = `${window.location.origin}`;
+    const socket = openSocket(url);
     Socket.init(socket);
   }, []);
 

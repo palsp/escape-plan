@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "start" : "docker compose up -d",
+    "down" : "docker compose down",
+    "destroy" : "docker compose down  --rmi local -v --remove-orphans"
+  }
+}
